@@ -8,12 +8,12 @@ const DEEPGRAM_URL = [
     "&language=en-IN",          // Indian English locale
     "&punctuate=true",          // auto punctuation
     "&interim_results=true",    // show words as spoken
-    "&utterance_end_ms=1200",   // wait 1.2s silence before finalising (Indian speech rhythm)
+    "&utterance_end_ms=1000",   // wait 1.2s silence before finalising (Indian speech rhythm)
     "&vad_events=true",         // voice activity detection — ignores background noise
     "&smart_format=true",       // formats numbers, dates, currency naturally
     "&filler_words=false",      // removes "um", "uh", "like" cleanly
     "&no_delay=true",           // low latency mode
-    "&endpointing=400",         // 400ms pause = end of utterance (good for Indian pacing)
+    "&endpointing=300",         // 400ms pause = end of utterance (good for Indian pacing)
 ].join("")
 
 const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {

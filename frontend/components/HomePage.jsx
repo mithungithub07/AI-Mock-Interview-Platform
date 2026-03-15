@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom"
 import RoleSelection from "../components/RoleSelection"
 import { startInterview } from "../services/api"
 import "../style/homepage.css"
-import "../public/female-programme-virtual-screen-digital-.jpg"
+//import "../src/images/female.jpg"
+import heroImage from "../src/images/female.jpg"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -56,7 +57,7 @@ const Home = () => {
 
                 {/* ── RIGHT ILLUSTRATION ── */}
                 <div className="hero-visual">
-                    <img src="/female-programme-virtual-screen-digital-.jpg" alt="AI Interview" />
+                    <img src={heroImage} alt="AI Interview" />
                 </div>
             </section>
         </div>

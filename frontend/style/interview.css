@@ -279,15 +279,15 @@
   padding: 0.4rem 0.9rem;
   border-radius: 8px;
   background: transparent;
-  color: #444;
-  border: 1px solid #252535;
+  color: #888;
+  border: 1px solid #3a3a4a;
   align-self: flex-start;
   transition: all 0.2s ease;
 }
 
 .qcard-btn-reset:hover {
-  color: #777;
-  border-color: #3a3a4a;
+  color: #bbb;
+  border-color: #555;
   background: rgba(255, 255, 255, 0.03);
 }
 
