@@ -1,0 +1,210 @@
+/* style/homepage.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0d0d0d;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── HERO SECTION ── */
+.hero-section {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 40%, #1a1a2e 0%, #0d0d0d 60%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8vw;
+  gap: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 88, 238, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── LEFT CONTENT ── */
+.hero-content {
+  flex: 1;
+  max-width: 560px;
+  animation: fadeSlideUp 0.9s ease both;
+}
+
+/* Brand label above the main title */
+.hero-brand {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;              /* smaller than before */
+  font-weight: 600;
+  letter-spacing: 0.18em;       /* keeps it on one line */
+  text-transform: uppercase;    /* AI MOCK INTERVIEW PLATFORM */
+  color: #5b52e8;               /* violet back */
+  margin-bottom: 1rem;
+  line-height: 1;
+  white-space: nowrap;          /* forces single line */
+
+}
+
+.hero-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.12;
+  color: #e8e8e8;
+  margin-bottom: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 1.05rem;
+  color: #9a9a9a;
+  line-height: 1.7;
+  margin-bottom: 2.4rem;
+  max-width: 420px;
+}
+
+/* ── HERO ACTIONS (role selector + button) ── */
+.hero-actions {
+  display: flex;
+  align-items: stretch;   /* same height for both children */
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Wrapper div that RoleSelection renders */
+.hero-actions > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Targets the <select> inside RoleSelection */
+.hero-actions select {
+  height: 48px;
+  padding: 0 2.2rem 0 1.1rem;
+  background: #1c1c2e;
+  color: #e0e0e0;
+  border: 1px solid #3a3a5c;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  appearance: none;
+  cursor: pointer;
+  min-width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%239a9a9a' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.hero-actions select:focus {
+  outline: none;
+  border-color: #5b52e8;
+  box-shadow: 0 0 0 3px rgba(91, 82, 232, 0.2);
+}
+
+/* Hide the label that RoleSelection renders */
+.hero-actions label {
+  display: none;
+}
+
+/* ── START INTERVIEW BUTTON ── */
+.btn-start {
+  height: 48px;
+  padding: 0 1.8rem;
+  background: #5b52e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.98rem;
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-end;   /* aligns to bottom of hero-actions when label is hidden */
+  transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 20px rgba(91, 82, 232, 0.35);
+}
+
+.btn-start:hover {
+  background: #6e65f0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(91, 82, 232, 0.5);
+}
+
+.btn-start:active {
+  transform: translateY(0);
+}
+
+/* ── RIGHT ILLUSTRATION ── */
+.hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 1.2s ease both 0.3s;
+}
+
+.hero-illustration {
+  width: 420px;
+  height: 380px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+}
+
+.hero-visual img {
+  max-width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 60px rgba(99, 88, 238, 0.25));
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 6rem 6vw 4rem;
+    gap: 3rem;
+  }
+
+  .hero-subtitle { max-width: 100%; }
+
+  .hero-actions { justify-content: center; }
+
+  .hero-actions select { min-width: 160px; }
+
+  .hero-visual { width: 100%; }
+
+  .hero-illustration {
+    width: 100%;
+    height: 240px;
+  }
+}

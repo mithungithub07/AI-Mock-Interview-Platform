@@ -1,0 +1,415 @@
+/* style/interview.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500&display=swap');
+
+/* ── PAGE WRAPPER ── */
+.interview-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 40% 20%, #1a1a2e 0%, #0d0d0d 65%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.interview-page::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(91, 82, 232, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── LOADING STATE ── */
+.interview-loading {
+  min-height: 100vh;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.interview-loading h2 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #9a9a9a;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5b52e8;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%            { transform: translateY(-10px); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* ── HEADER ── */
+.interview-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+  animation: fadeSlideDown 0.7s ease both;
+}
+
+.interview-role-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #5b52e8;
+  margin-bottom: 0.4rem;
+}
+
+.interview-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: #e8e8e8;
+  letter-spacing: -0.02em;
+}
+
+/* ── PROGRESS BAR ── */
+.interview-progress {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 1.2rem;
+  animation: fadeIn 0.8s ease both 0.2s;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 0.4rem;
+  font-family: 'Sora', sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.progress-track {
+  width: 100%;
+  height: 3px;
+  background: #1e1e1e;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5b52e8, #8b7ff5);
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── MAIN CARD ── */
+.interview-card {
+  width: 100%;
+  max-width: 720px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 2rem 2.4rem;
+  backdrop-filter: blur(12px);
+  animation: fadeSlideUp 0.7s ease both 0.15s;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Question number badge */
+.question-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(91, 82, 232, 0.15);
+  border: 1px solid rgba(91, 82, 232, 0.3);
+  color: #8b7ff5;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.85rem;
+  border-radius: 99px;
+  margin-bottom: 1rem;
+}
+
+/* ══════════════════════════════════════
+   QUESTIONCARD STYLES
+   Uses classNames added to QuestionCard:
+     .qcard, .qcard-number, .qcard-question,
+     .qcard-btn-record, .qcard-btn-recording,
+     .qcard-answer-label, .qcard-answer-text,
+     .qcard-btn-reset
+   ══════════════════════════════════════ */
+
+.qcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Hide "Question N" — badge above already shows it */
+.qcard-number {
+  display: none;
+}
+
+/* Question text */
+.qcard-question {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.08rem;
+  color: #d4d4d4;
+  line-height: 1.75;
+  margin-bottom: 1.6rem;
+}
+
+/* "YOUR ANSWER" label */
+.qcard-answer-label strong {
+  display: block;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5b52e8;
+  margin-bottom: 0.5rem;
+}
+
+/* Answer text box */
+.qcard-answer-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #666;
+  font-style: italic;
+  line-height: 1.65;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.2rem;
+  min-height: 52px;
+}
+
+/* Answer has real content */
+.qcard-answer-text.has-answer {
+  color: #c8c8c8;
+  font-style: normal;
+}
+
+/* ── Start / Stop Recording button ── */
+.qcard-btn-record {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  background: rgba(91, 82, 232, 0.14);
+  color: #a89ff7;
+  border: 1px solid rgba(91, 82, 232, 0.35);
+  margin-bottom: 1.4rem;
+  align-self: flex-start;
+  transition: all 0.22s ease;
+}
+
+.qcard-btn-record:hover {
+  background: rgba(91, 82, 232, 0.26);
+  color: #c4bcff;
+  border-color: rgba(91, 82, 232, 0.6);
+  box-shadow: 0 0 18px rgba(91, 82, 232, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Active/recording state — red pulsing glow */
+.qcard-btn-recording {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  animation: recordPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.15); }
+  50%       { box-shadow: 0 0 22px rgba(239, 68, 68, 0.4); }
+}
+
+/* ── Reset Answer button ── */
+.qcard-btn-reset {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  background: transparent;
+  color: #444;
+  border: 1px solid #252535;
+  align-self: flex-start;
+  transition: all 0.2s ease;
+}
+
+.qcard-btn-reset:hover {
+  color: #777;
+  border-color: #3a3a4a;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── NAVIGATION ROW ── */
+.interview-nav {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  animation: fadeIn 0.8s ease both 0.3s;
+}
+
+.nav-hint {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.75rem;
+  color: #444;
+  letter-spacing: 0.05em;
+}
+.nav-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+
+.btn-prev {
+    padding: 0.8rem 1.6rem;
+    border: 1px solid rgba(91, 82, 232, 0.4);
+    border-radius: 10px;
+    background: transparent;
+    color: #5b52e8;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-prev:hover:not(:disabled) {
+    background: rgba(91, 82, 232, 0.1);
+    border-color: #5b52e8;
+    transform: translateY(-2px);
+}
+
+.btn-prev:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.btn-next,
+.btn-submit {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-next {
+  background: #5b52e8;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(91, 82, 232, 0.35);
+}
+
+.btn-next:hover:not(:disabled) {
+  background: #6e65f0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(91, 82, 232, 0.5);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #5b52e8, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.55);
+}
+
+.btn-next:disabled,
+.btn-submit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .interview-card { padding: 1.5rem 1.2rem; }
+
+  .interview-nav {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .btn-next,
+  .btn-submit {
+    width: 100%;
+    text-align: center;
+  }
+}
