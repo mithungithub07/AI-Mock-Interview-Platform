@@ -28,6 +28,7 @@ const Feedback = () => {
     let data = null
     try {
         data = typeof raw === "string" ? JSON.parse(raw) : raw
+        console.log("FEEDBACK DATA:", data)
     } catch {
         data = null
     }

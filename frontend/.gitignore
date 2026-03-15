@@ -48,14 +48,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-venv/
-*.egg-info/
-
-# Environment variables — never push API keys
-.env
-.env.local
-.env.production

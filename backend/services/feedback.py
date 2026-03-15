@@ -9,6 +9,8 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate_feedback_ai(role, interview_data):
+    print("INTERVIEW DATA RECEIVED:", interview_data)
+
     try:
         for item in interview_data:
           if not item["answer"] or len(item["answer"].strip()) < 5:
