@@ -16,7 +16,7 @@ def generate_questions(role: str):
         prompt = interview_question_prompt(role)
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            temperature=0.1,
+            temperature=0.9,
             messages=[
                 {"role": "user", "content": prompt}
             ]

@@ -1,19 +1,19 @@
 # ── Configuration ──────────────────────────────────────────
+import random
 QUESTION_COUNT = 5
-
-DIFFICULTY = {
-    "Basic":        int(QUESTION_COUNT * 0.6),
-    "Intermediate": int(QUESTION_COUNT * 0.3),
-    "Hard":         QUESTION_COUNT - int(QUESTION_COUNT * 0.6) - int(QUESTION_COUNT * 0.3),
-}
-
-# ── Prompts ────────────────────────────────────────────────
 
 def interview_question_prompt(role: str) -> str:
 
+    difficulty = {
+        "Basic":        int(QUESTION_COUNT * 0.6),
+        "Intermediate": int(QUESTION_COUNT * 0.3),
+        "Hard":         QUESTION_COUNT - int(QUESTION_COUNT * 0.6) - int(QUESTION_COUNT * 0.3),
+    }
+
+
     difficulty_lines = "\n".join(
         f"- {count} {level} question{'s' if count > 1 else ''}"
-        for level, count in DIFFICULTY.items()
+        for level, count in difficulty.items()
         if count > 0
     )
 
@@ -21,10 +21,28 @@ def interview_question_prompt(role: str) -> str:
         f"Q{i}. <question>" for i in range(1, QUESTION_COUNT + 1)
     )
 
-    return f"""
-You are an AI interviewer.
+    # random topics to force variety every time
+    topic_angles = [
+        "focus on memory and performance concepts",
+        "focus on error handling and debugging",
+        "focus on data structures and algorithms concepts",
+        "focus on OOP and design principles",
+        "focus on concurrency and multithreading concepts",
+        "focus on databases and storage concepts",
+        "focus on security and best practices",
+        "focus on testing and code quality concepts",
+        "focus on APIs and networking concepts",
+        "focus on system design concepts",
+    ]
+    
+    random_angle = random.choice(topic_angles)
+    random_seed  = random.randint(1, 99999)
 
-Generate exactly {QUESTION_COUNT} interview questions for the role: {role}.
+    return f"""
+You are an AI interviewer. Session ID: {random_seed}
+
+Generate exactly {QUESTION_COUNT} UNIQUE interview questions for the role: {role}.
+This session angle: {random_angle}
 
 Difficulty distribution:
 {difficulty_lines}
@@ -37,6 +55,7 @@ Rules:
 - Do NOT ask questions that require writing code, designing systems, or drawing diagrams.
 - Do NOT ask "implement", "write", "design", "build", "create", or "code" questions.
 - Ask concept-based, experience-based, or explanation-based questions only.
+- NEVER repeat questions from previous sessions — always generate fresh questions.
 - Example GOOD: "What is the difference between list and tuple in Python?"
 - Example BAD: "Implement a function to find the maximum value in a nested list."
 

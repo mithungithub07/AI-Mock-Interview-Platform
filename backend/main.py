@@ -10,7 +10,8 @@ app.add_middleware(
     allow_origins=[
         "https://ai-mock-interview-platform-bymithun.vercel.app",
         "https://ai-mock-interview-platform-git-618cb6-mithungithub07s-projects.vercel.app",
-        "https://ai-mock-interview-platform-bymithun-f7p5p5jxr.vercel.app"
+        "https://ai-mock-interview-platform-bymithun-f7p5p5jxr.vercel.app",
+        "http://localhost:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],
