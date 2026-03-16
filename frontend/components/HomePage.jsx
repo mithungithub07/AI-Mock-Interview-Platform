@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import RoleSelection from "../components/RoleSelection"
 import { startInterview } from "../services/api"
 import "../style/homepage.css"
-//import "../src/images/female.jpg"
 import heroImage from "../src/images/female.jpg"
 
 const Home = () => {
