@@ -7,7 +7,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://ai-mock-interview-platform-bymithun.vercel.app",
+        "https://ai-mock-interview-platform-git-618cb6-mithungithub07s-projects.vercel.app",
+        "https://ai-mock-interview-platform-bymithun-f7p5p5jxr.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
