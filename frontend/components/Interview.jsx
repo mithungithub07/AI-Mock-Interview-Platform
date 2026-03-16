@@ -69,18 +69,18 @@ const Interview = () => {
   }
 
   const progress = Math.round(((currentQuestion + 1) / questions.length) * 100)
-  const isLast = currentQuestion === questions.length - 1   // ← THIS WAS MISSING
+  const isLast = currentQuestion === questions.length - 1
 
   return (
     <div className="interview-page">
 
-      {/* Header */}
+
       <div className="interview-header">
         <p className="interview-role-label">AI Mock Interview</p>
         <h1 className="interview-title">{role} Interview</h1>
       </div>
 
-      {/* Progress */}
+
       <div className="interview-progress">
         <div className="progress-info">
           <span>Question {currentQuestion + 1} of {questions.length}</span>
@@ -91,7 +91,7 @@ const Interview = () => {
         </div>
       </div>
 
-      {/* Card */}
+
       <div className="interview-card">
         <div className="question-badge">Question {currentQuestion + 1}</div>
         <QuestionCard
@@ -103,7 +103,7 @@ const Interview = () => {
         />
       </div>
 
-      {/* Navigation */}
+
       <div className="interview-nav">
         <span className="nav-hint">
           {isRecording ? "⏺ Stop recording before continuing" : isLast ? "Ready to submit?" : "Answer, then move on"}

@@ -34,7 +34,7 @@ const Home = () => {
     return (
         <div>
             <section className="hero-section">
-                {/* ── LEFT CONTENT ── */}
+
                 <div className="hero-content">
                     <p className="hero-brand">AI Mock Interview Platform</p>
                     <h1 className="hero-title">Prepare for Your Next Interview</h1>
@@ -43,7 +43,7 @@ const Home = () => {
                         to understand where you stand.
                     </p>
 
-                    {/* Role selector + Start button — replaces Get Started */}
+
                     <div className="hero-actions">
                         <RoleSelection
                             selectedRoles={selectedRole}
@@ -55,7 +55,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* ── RIGHT ILLUSTRATION ── */}
+
                 <div className="hero-visual">
                     <img src={heroImage} alt="AI Interview" />
                 </div>

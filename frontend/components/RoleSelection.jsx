@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { startInterview } from "../services/api"
 
-// selectedRole
+
 
 const RoleSelection = ({ setQuestions, setRole, selectedRole }) => {
 
@@ -31,7 +31,6 @@ const RoleSelection = ({ setQuestions, setRole, selectedRole }) => {
     try {
       const data = await startInterview(selectedRole)
       setQuestions(data.questions)
-
       navigate("/interview")
     } catch (err) {
       console.error("Error starting interview:", err)

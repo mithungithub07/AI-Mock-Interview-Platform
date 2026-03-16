@@ -196,14 +196,14 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             <p className="qcard-question">{question}</p>
 
-            {/* Status indicator */}
+
             {statusLabel && (
                 <p className={`qcard-status ${status === "error" ? "qcard-status-error" : ""}`}>
                     {statusLabel}
                 </p>
             )}
 
-            {/* Record / Stop button */}
+
             {!listening ? (
                 <button
                     className="qcard-btn-record"

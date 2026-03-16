@@ -52,14 +52,14 @@ const Feedback = () => {
     return (
         <div className="fb-page">
 
-            {/* ── HEADER ── */}
+
             <div className="fb-header">
                 <p className="fb-label">AI Mock Interview</p>
                 <h1 className="fb-title">Interview Complete 🎉</h1>
                 <p className="fb-subtitle">Here's a detailed breakdown of your performance</p>
             </div>
 
-            {/* ── SCORE CARD ── */}
+
             <div className="fb-scorecard">
                 <div className="fb-score-ring">
                     <svg viewBox="0 0 120 120" className="fb-ring-svg">
@@ -72,7 +72,7 @@ const Feedback = () => {
                     </svg>
                     <div className="fb-score-inner">
                         <span className="fb-score-number">{overall_score}</span>
-                        {/* dynamically shows /5 or /10 based on question count */}
+
                         <span className="fb-score-denom">/{totalQuestions}</span>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ const Feedback = () => {
                 </div>
             </div>
 
-            {/* ── QUESTION BREAKDOWN ── */}
+
             <div className="fb-questions">
                 <h2 className="fb-section-title">Question Breakdown</h2>
 
@@ -114,7 +114,7 @@ const Feedback = () => {
                                 <span className="fb-qtext">{q.question}</span>
                             </div>
                             <div className="fb-qcard-right">
-                                {/* shows 1/1 or 0/1 per question */}
+
                                 <span className={`fb-score-badge ${scoreColor(q.score)}`}>
                                     {q.score}/1
                                 </span>
@@ -151,7 +151,7 @@ const Feedback = () => {
                 ))}
             </div>
 
-            {/* ── BACK BUTTON ── */}
+
             <button className="fb-btn-home" onClick={() => navigate("/")}>
                 ← Back to Home
             </button>
