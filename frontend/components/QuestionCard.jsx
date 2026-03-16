@@ -153,7 +153,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         setStatus("idle")
     }
 
-    // ── Edit handlers ──
+
     const handleEdit = (e) => {
         setAnswer(e.target.value)
         answerRef.current = e.target.value
@@ -185,7 +185,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 </p>
             )}
 
-            {/* Record / Stop button */}
+
             {!listening ? (
                 <button
                     className="qcard-btn-record"
@@ -202,7 +202,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             <p className="qcard-answer-label"><strong>Your Answer</strong></p>
 
-            {/* Answer display OR edit textarea */}
+
             {isEditing ? (
                 <textarea
                     className="qcard-answer-edit"
@@ -217,21 +217,21 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 </p>
             )}
 
-            {/* Button row */}
+
             <div className="qcard-btn-row">
                 <button className="qcard-btn-reset" onClick={resetRecording}>
                     Reset Answer
                 </button>
 
-                {/* Edit / Save — only show when answer exists and not recording */}
+
                 {answer && !listening && (
                     isEditing ? (
                         <button className="qcard-btn-save" onClick={saveEdit}>
-                            ✓ Save Answer
+                            Save Answer
                         </button>
                     ) : (
                         <button className="qcard-btn-edit" onClick={() => setIsEditing(true)}>
-                            ✏ Edit Answer
+                            Edit Answer
                         </button>
                     )
                 )}
