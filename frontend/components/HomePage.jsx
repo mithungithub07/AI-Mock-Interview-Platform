@@ -49,7 +49,7 @@ const Home = () => {
                             setRole={setSelectedRole}
                         />
                         <button className="btn-start" onClick={handleStart}>
-                            Start Interview →
+                            Start Interview
                         </button>
                     </div>
                 </div>
