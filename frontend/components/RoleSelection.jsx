@@ -12,13 +12,9 @@ const RoleSelection = ({ setQuestions, setRole, selectedRole }) => {
   const roles = [
     "Java Developer",
     "Python Developer",
-    "Frontend Developer",
-    "Backend Developer",
     "Full Stack Developer",
-    "React Developer",
-    "Data Analyst",
-    "Machine Learning Engineer",
-    "DevOps Engineer"
+    "React Developer"
+
   ]
 
 
