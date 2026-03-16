@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 import "../style/feedback.css"
 
 
-
 const scoreColor = (score) => {
     if (score === 1) return "score-high"
     return "score-low"
