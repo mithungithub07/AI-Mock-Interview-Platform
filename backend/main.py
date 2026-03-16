@@ -22,9 +22,9 @@ app.add_middleware(
 app.include_router(interview_router)
 app.include_router(deepgram_router)
 
-# @app.get("/")
-# def homepage():
-#    return {"message": "AI Based Mock Interview Platform"}
+@app.get("/")
+def homepage():
+   return {"message": "AI Based Mock Interview Platform"}
 
 
 
