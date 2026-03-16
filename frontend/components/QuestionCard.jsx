@@ -1,19 +1,18 @@
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 
-
 const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
     "?model=nova-2",
-    "&language=en-IN",          // Indian English locale
-    "&punctuate=true",          // auto punctuation
-    "&interim_results=true",    // show words as spoken
-    "&utterance_end_ms=1000",   // wait 1.2s silence before finalising (Indian speech rhythm)
-    "&vad_events=true",         // voice activity detection — ignores background noise
-    "&smart_format=true",       // formats numbers, dates, currency naturally
-    "&filler_words=false",      // removes "um", "uh", "like" cleanly
-    "&no_delay=true",           // low latency mode
-    "&endpointing=300",         // 400ms pause = end of utterance (good for Indian pacing)
+    "&language=en-IN",
+    "&punctuate=true",
+    "&interim_results=true",
+    "&utterance_end_ms=1000",
+    "&vad_events=true",
+    "&smart_format=true",
+    "&filler_words=false",
+    "&no_delay=true",
+    "&endpointing=300",
 ].join("")
 
 const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
@@ -21,30 +20,24 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
     const [answer, setAnswer] = useState("")
     const [listening, setListening] = useState(false)
     const [status, setStatus] = useState("idle")
+    const [isEditing, setIsEditing] = useState(false)  // ← edit state
 
     const socketRef = useRef(null)
     const mediaRecorderRef = useRef(null)
     const answerRef = useRef("")
     const silenceTimer = useRef(null)
 
-
     useEffect(() => { answerRef.current = answer }, [answer])
-
-
     useEffect(() => () => stopAll(), [])
-
-
 
     const stopAll = () => {
         clearTimeout(silenceTimer.current)
-
         if (mediaRecorderRef.current?.state !== "inactive") {
             try { mediaRecorderRef.current?.stop() } catch { }
         }
         mediaRecorderRef.current?.stream
             ?.getTracks()
             ?.forEach(t => t.stop())
-
         if (socketRef.current?.readyState === WebSocket.OPEN) {
             socketRef.current.close()
         }
@@ -54,17 +47,12 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         onAnswer(answerRef.current.trim())
     }
 
-
-
     const startRecording = async () => {
         if (listening) return
         setStatus("connecting")
-
         try {
-
             const tokenRes = await axios.get("https://ai-mock-interview-platform-pryk.onrender.com/deepgram-token")
             const token = tokenRes.data.token
-
 
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -76,7 +64,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 }
             })
 
-
             const mimeType = [
                 "audio/webm;codecs=opus",
                 "audio/webm",
@@ -85,7 +72,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             const mediaRecorder = new MediaRecorder(stream, { mimeType })
             mediaRecorderRef.current = mediaRecorder
-
 
             const socket = new WebSocket(DEEPGRAM_URL, ["token", token])
             socketRef.current = socket
@@ -99,16 +85,12 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             socket.onmessage = (msg) => {
                 const data = JSON.parse(msg.data)
-
-
                 if (data.type === "Results") {
                     const alt = data.channel?.alternatives?.[0]
                     if (!alt?.transcript) return
-
                     const transcript = alt.transcript.trim()
                     if (!transcript) return
-
-                    if (data.is_final || data.speech_final) {
+                    if (data.speech_final) {
                         setAnswer(prev => {
                             const updated = prev ? prev + " " + transcript : transcript
                             answerRef.current = updated
@@ -116,8 +98,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                         })
                     }
                 }
-
-
                 if (data.type === "UtteranceEnd") {
                     finaliseAnswer()
                 }
@@ -141,7 +121,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
             }
 
             mediaRecorder.onstop = () => {
-
                 if (socket.readyState === WebSocket.OPEN) {
                     socket.send(JSON.stringify({ type: "CloseStream" }))
                 }
@@ -155,8 +134,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         }
     }
 
-
-
     const stopRecording = () => {
         setStatus("stopping")
         stopAll()
@@ -166,18 +143,26 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         setStatus("idle")
     }
 
-
-
     const resetRecording = () => {
         stopAll()
         setAnswer("")
         answerRef.current = ""
         setListening(false)
         setIsRecording(false)
+        setIsEditing(false)
         setStatus("idle")
     }
 
+    // ── Edit handlers ──
+    const handleEdit = (e) => {
+        setAnswer(e.target.value)
+        answerRef.current = e.target.value
+    }
 
+    const saveEdit = () => {
+        setIsEditing(false)
+        onAnswer(answer)
+    }
 
     const statusLabel = {
         idle: "",
@@ -187,8 +172,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         error: "⚠️ Mic error — check permissions",
     }[status]
 
-
-
     return (
         <div className="qcard">
 
@@ -196,14 +179,13 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             <p className="qcard-question">{question}</p>
 
-
             {statusLabel && (
                 <p className={`qcard-status ${status === "error" ? "qcard-status-error" : ""}`}>
                     {statusLabel}
                 </p>
             )}
 
-
+            {/* Record / Stop button */}
             {!listening ? (
                 <button
                     className="qcard-btn-record"
@@ -220,13 +202,40 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             <p className="qcard-answer-label"><strong>Your Answer</strong></p>
 
-            <p className={`qcard-answer-text ${answer ? "has-answer" : ""}`}>
-                {answer || "No answer recorded yet"}
-            </p>
+            {/* Answer display OR edit textarea */}
+            {isEditing ? (
+                <textarea
+                    className="qcard-answer-edit"
+                    value={answer}
+                    onChange={handleEdit}
+                    rows={4}
+                    autoFocus
+                />
+            ) : (
+                <p className={`qcard-answer-text ${answer ? "has-answer" : ""}`}>
+                    {answer || "No answer recorded yet"}
+                </p>
+            )}
 
-            <button className="qcard-btn-reset" onClick={resetRecording}>
-                Reset Answer
-            </button>
+            {/* Button row */}
+            <div className="qcard-btn-row">
+                <button className="qcard-btn-reset" onClick={resetRecording}>
+                    Reset Answer
+                </button>
+
+                {/* Edit / Save — only show when answer exists and not recording */}
+                {answer && !listening && (
+                    isEditing ? (
+                        <button className="qcard-btn-save" onClick={saveEdit}>
+                            ✓ Save Answer
+                        </button>
+                    ) : (
+                        <button className="qcard-btn-edit" onClick={() => setIsEditing(true)}>
+                            ✏ Edit Answer
+                        </button>
+                    )
+                )}
+            </div>
 
         </div>
     )
