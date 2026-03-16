@@ -48,7 +48,7 @@ const Interview = () => {
   }
 
   const submitInterview = async () => {
-    const response = await fetch("http://127.0.0.1:8000/generate-feedback", {
+    const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ role: role, interview_data: answers })

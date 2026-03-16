@@ -62,7 +62,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
         try {
 
-            const tokenRes = await axios.get("http://127.0.0.1:8000/deepgram-token")
+            const tokenRes = await axios.get("https://ai-mock-interview-platform-pryk.onrender.com/deepgram-token")
             const token = tokenRes.data.token
 
 
