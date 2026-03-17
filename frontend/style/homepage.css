@@ -84,6 +84,29 @@ body {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+.level-select {
+    height: 48px;
+    padding: 0 2.2rem 0 1.1rem;
+    background: #1c1c2e;
+    color: #e0e0e0;
+    border: 1px solid #3a3a5c;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    appearance: none;
+    cursor: pointer;
+    min-width: 200px;
+    transition: border-color 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%239a9a9a' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}
+
+.level-select:focus {
+    outline: none;
+    border-color: #5b52e8;
+    box-shadow: 0 0 0 3px rgba(91, 82, 232, 0.2);
+}
 
 /* Wrapper div that RoleSelection renders */
 .hero-actions > div {

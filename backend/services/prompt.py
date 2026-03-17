@@ -1,4 +1,4 @@
-# ── Configuration ──────────────────────────────────────────
+#Configuration 
 import random
 QUESTION_COUNT = 5
 
@@ -20,8 +20,7 @@ def interview_question_prompt(role: str) -> str:
     numbered_format = "\n".join(
         f"Q{i}. <question>" for i in range(1, QUESTION_COUNT + 1)
     )
-
-    # random topics to force variety every time
+    
     topic_angles = [
         "focus on memory and performance concepts",
         "focus on error handling and debugging",

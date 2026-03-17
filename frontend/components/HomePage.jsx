@@ -8,11 +8,12 @@ import heroImage from "../src/images/female.jpg"
 const Home = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("")
-    console.log("selectedRole")
+    const [selectedLevel, setSelectedLevel] = useState("")
+
 
     const handleStart = async () => {
-        if (!selectedRole) {
-            alert("Please select a role")
+        if (!selectedRole || !selectedLevel) {
+            alert("Please select both a role and level")
             return
         }
         try {
@@ -48,6 +49,19 @@ const Home = () => {
                             selectedRoles={selectedRole}
                             setRole={setSelectedRole}
                         />
+                        {/* Level dropdown */}
+                        <select
+                            className="level-select"
+                            value={selectedLevel}
+                            onChange={(e) => setSelectedLevel(e.target.value)}
+                        >
+                            <option value="">Select Level</option>
+                            <option value="fresher">🌱 Fresher (0–1 yrs)</option>
+                            <option value="junior">💼 Junior (1–3 yrs)</option>
+                            <option value="senior">⭐ Senior (3–8 yrs)</option>
+                            <option value="architect">🏛 Architect (8+ yrs)</option>
+                        </select>
+
                         <button className="btn-start" onClick={handleStart}>
                             Start Interview
                         </button>
