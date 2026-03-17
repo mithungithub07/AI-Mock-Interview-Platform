@@ -2,6 +2,15 @@
 import random
 QUESTION_COUNT = 5
 
+topic_angles = [
+    "focus on fundamentals",
+    "real-world scenarios",
+    "common pitfalls",
+    "best practices",
+    "conceptual clarity",
+    "trade-offs and decision making"
+]
+
 def interview_question_prompt(role: str, level: str) -> str:
 
     level_guide = {
