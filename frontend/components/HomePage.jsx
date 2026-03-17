@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+
 import RoleSelection from "../components/RoleSelection"
 import { startInterview } from "../services/api"
 import heroImage from "../src/images/female.jpg"
@@ -9,6 +10,10 @@ const Home = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("")
+
+    useEffect(() => {
+        sessionStorage.clear()
+    }, [])
 
 
     const handleStart = async () => {
