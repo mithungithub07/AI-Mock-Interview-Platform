@@ -23,7 +23,7 @@ const Home = () => {
                 alert("No questions received from server")
                 return
             }
-
+            sessionStorage.clear()
             navigate("/interview", { state: { role: selectedRole, level: selectedLevel, questions: data.questions } })
         } catch (err) {
             console.error("Error starting interview:", err)

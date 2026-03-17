@@ -7,17 +7,43 @@ const Interview = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const role = location.state?.role
-  const level = location.state?.level
+  const role = location.state?.role || sessionStorage.getItem("role")
+  const level = location.state?.level || sessionStorage.getItem("level")
 
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState([])
+  const [currentQuestion, setCurrentQuestion] = useState(() => {
+    return parseInt(sessionStorage.getItem("currentQuestion") || "0")
+  })
+
+  const [answers, setAnswers] = useState(() => {
+    const saved = sessionStorage.getItem("answers")
+    return saved ? JSON.parse(saved) : []
+  })
+
   const [isRecording, setIsRecording] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(60) // 1 minute per question
+  const [timeLeft, setTimeLeft] = useState(60)
 
-  const [questions, setQuestions] = useState(
-    Array.isArray(location.state?.questions) ? location.state.questions : []
-  )
+  const [questions, setQuestions] = useState(() => {
+    const saved = sessionStorage.getItem("questions")
+    if (saved) return JSON.parse(saved)
+    return Array.isArray(location.state?.questions) ? location.state.questions : []
+  })
+
+  // Save to sessionStorage whenever these change
+  useEffect(() => {
+    if (questions.length > 0) {
+      sessionStorage.setItem("questions", JSON.stringify(questions))
+      sessionStorage.setItem("role", role)
+      sessionStorage.setItem("level", level)
+    }
+  }, [questions])
+
+  useEffect(() => {
+    sessionStorage.setItem("currentQuestion", currentQuestion)
+  }, [currentQuestion])
+
+  useEffect(() => {
+    sessionStorage.setItem("answers", JSON.stringify(answers))
+  }, [answers])
 
   const saveAnswer = (answer) => {
     const updated = [...answers]
@@ -33,9 +59,9 @@ const Interview = () => {
     if (timeLeft <= 0) {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1)
-        setTimeLeft(60) // reset timer for next question
+        setTimeLeft(60)
       } else {
-        submitInterview() // auto-submit if last question
+        submitInterview()
       }
     }
 
@@ -48,7 +74,7 @@ const Interview = () => {
 
   const nextQuestion = () => {
     setCurrentQuestion(currentQuestion + 1)
-    setTimeLeft(60) // reset timer manually if user clicks next
+    setTimeLeft(60)
   }
 
   const submitInterview = async () => {
@@ -62,6 +88,7 @@ const Interview = () => {
       })
     })
     const data = await response.json()
+    sessionStorage.clear() // clear on submit
     navigate("/feedback", { state: { feedback: data.feedback } })
   }
 
@@ -122,7 +149,6 @@ const Interview = () => {
         </span>
 
         <div className="nav-buttons">
-          {/* Removed Prev button */}
           {!isLast ? (
             <button className="btn-next" onClick={nextQuestion} disabled={isRecording}>
               Next Question
