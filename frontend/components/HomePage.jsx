@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import RoleSelection from "./RoleSelection"
+import RoleSelection from "../components/RoleSelection"
 import { startInterview } from "../services/api"
 import heroImage from "../src/images/female.jpg"
 
