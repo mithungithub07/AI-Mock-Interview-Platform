@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import QuestionCard from "./QuestionCard"
 import "../style/interview.css"
 
@@ -13,7 +13,7 @@ const Interview = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
   const [isRecording, setIsRecording] = useState(false)
-
+  const [timeLeft, setTimeLeft] = useState(60) // 1 minute per question
 
   const [questions, setQuestions] = useState(
     Array.isArray(location.state?.questions) ? location.state.questions : []
@@ -28,8 +28,28 @@ const Interview = () => {
     setAnswers(updated)
   }
 
-  const nextQuestion = () => setCurrentQuestion(currentQuestion + 1)
-  const prevQuestion = () => setCurrentQuestion(currentQuestion - 1)
+  // Timer logic
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1)
+        setTimeLeft(60) // reset timer for next question
+      } else {
+        submitInterview() // auto-submit if last question
+      }
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [timeLeft, currentQuestion])
+
+  const nextQuestion = () => {
+    setCurrentQuestion(currentQuestion + 1)
+    setTimeLeft(60) // reset timer manually if user clicks next
+  }
 
   const submitInterview = async () => {
     const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
@@ -77,6 +97,13 @@ const Interview = () => {
         </div>
       </div>
 
+      {/* Timer display */}
+      <div className="timer">
+        <span className={timeLeft <= 10 ? "timer-warning" : ""}>
+          ⏱ Time left: {timeLeft}s
+        </span>
+      </div>
+
       <div className="interview-card">
         <div className="question-badge">Question {currentQuestion + 1}</div>
         <QuestionCard
@@ -94,12 +121,7 @@ const Interview = () => {
         </span>
 
         <div className="nav-buttons">
-          {currentQuestion > 0 && (
-            <button className="btn-prev" onClick={prevQuestion} disabled={isRecording}>
-              Prev
-            </button>
-          )}
-
+          {/* Removed Prev button */}
           {!isLast ? (
             <button className="btn-next" onClick={nextQuestion} disabled={isRecording}>
               Next Question

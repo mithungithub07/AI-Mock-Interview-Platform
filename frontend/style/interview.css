@@ -500,3 +500,31 @@
   color: #5b52e8;
   margin-top: 0.3rem;
 }
+
+.timer {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.timer span {
+  background: #f9d6d5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #d9534f; /* default red */
+  transition: all 0.3s ease;
+}
+
+/* Flash effect in last 10 seconds */
+.timer-warning {
+  animation: flash 1s infinite;
+  background: #d9534f;
+  color: #fff;
+}
+
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
