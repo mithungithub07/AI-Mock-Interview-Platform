@@ -105,14 +105,6 @@ const Interview = () => {
         </div>
       </div>
 
-
-      {/* Timer display */}
-      <div className="timer">
-        <span className={timeLeft <= 10 ? "timer-warning" : ""}>
-          ⏱ {timeLeft}s
-        </span>
-      </div>
-
       <div className="interview-card">
         <div className="question-badge">Question {currentQuestion + 1}</div>
         <QuestionCard
