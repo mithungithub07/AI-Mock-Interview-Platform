@@ -27,6 +27,7 @@ def generate_questions(role: str, level: str):
     except Exception as e:
         print("ERROR:", e)
         return {
+            "error": str(e),
             "role": role,
-            "questions": response.choices[0].message.content
+            "questions": []
             }
