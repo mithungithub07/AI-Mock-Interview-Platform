@@ -9,10 +9,11 @@ router = APIRouter()
 @router.post("/start-interview")
 def start_interview(request: InterviewRequest):
     role = request.role
-    
-    questions = generate_questions(role)
+    level = request.level
+    questions = generate_questions(role, level)
 
     return {"role": role,
+            "level":level,
             "questions":questions
             }
 

@@ -9,11 +9,11 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_questions(role: str):
+def generate_questions(role: str, level: str):
 
     try:
         
-        prompt = interview_question_prompt(role)
+        prompt = interview_question_prompt(role, level)
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             temperature=0.9,

@@ -2,14 +2,20 @@
 import random
 QUESTION_COUNT = 5
 
-def interview_question_prompt(role: str) -> str:
+def interview_question_prompt(role: str, level: str) -> str:
+
+    level_guide = {
+        "fresher":   "basic concepts, definitions, simple differences",
+        "junior":    "practical usage, common patterns, basic problem solving",
+        "senior":    "deep understanding, best practices, performance, trade-offs",
+        "architect": "system thinking, design decisions, scalability, leadership",
+    }
 
     difficulty = {
         "Basic":        int(QUESTION_COUNT * 0.6),
         "Intermediate": int(QUESTION_COUNT * 0.3),
         "Hard":         QUESTION_COUNT - int(QUESTION_COUNT * 0.6) - int(QUESTION_COUNT * 0.3),
     }
-
 
     difficulty_lines = "\n".join(
         f"- {count} {level} question{'s' if count > 1 else ''}"
@@ -20,20 +26,7 @@ def interview_question_prompt(role: str) -> str:
     numbered_format = "\n".join(
         f"Q{i}. <question>" for i in range(1, QUESTION_COUNT + 1)
     )
-    
-    topic_angles = [
-        "focus on memory and performance concepts",
-        "focus on error handling and debugging",
-        "focus on data structures and algorithms concepts",
-        "focus on OOP and design principles",
-        "focus on concurrency and multithreading concepts",
-        "focus on databases and storage concepts",
-        "focus on security and best practices",
-        "focus on testing and code quality concepts",
-        "focus on APIs and networking concepts",
-        "focus on system design concepts",
-    ]
-    
+
     random_angle = random.choice(topic_angles)
     random_seed  = random.randint(1, 99999)
 
@@ -41,22 +34,21 @@ def interview_question_prompt(role: str) -> str:
 You are an AI interviewer. Session ID: {random_seed}
 
 Generate exactly {QUESTION_COUNT} UNIQUE interview questions for the role: {role}.
-This session angle: {random_angle}
+Candidate level: {level}
+Level focus: {level_guide.get(level, "general concepts")}
+Session angle: {random_angle}
 
 Difficulty distribution:
 {difficulty_lines}
 
 Rules:
+- Match question complexity to the candidate level.
 - Questions must be commonly asked in real interviews.
 - Each question must be under 20 words.
-- Focus on practical topics relevant to the role.
 - ALL questions must be answerable VERBALLY in a spoken interview.
-- Do NOT ask questions that require writing code, designing systems, or drawing diagrams.
 - Do NOT ask "implement", "write", "design", "build", "create", or "code" questions.
 - Ask concept-based, experience-based, or explanation-based questions only.
-- NEVER repeat questions from previous sessions — always generate fresh questions.
-- Example GOOD: "What is the difference between list and tuple in Python?"
-- Example BAD: "Implement a function to find the maximum value in a nested list."
+- NEVER repeat questions — always generate fresh questions.
 
 STRICT OUTPUT RULES:
 - Output ONLY the questions — no intro, no explanation, no extra text.
