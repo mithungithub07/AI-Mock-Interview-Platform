@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import RoleSelection from "../components/RoleSelection"
+//import RoleSelection from "../components/RoleSelection"
 import { startInterview } from "../services/api"
 import "../style/homepage.css"
 import heroImage from "../src/images/female.jpg"
@@ -17,14 +17,14 @@ const Home = () => {
             return
         }
         try {
-            const data = await startInterview(selectedRole)
+            const data = await startInterview(selectedRole, selectedLevel)
 
             if (!data.questions || data.questions.length === 0) {
                 alert("No questions received from server")
                 return
             }
 
-            navigate("/interview", { state: { role: selectedRole, questions: data.questions } })
+            navigate("/interview", { state: { role: selectedRole, level: selectedLevel, questions: data.questions } })
         } catch (err) {
             console.error("Error starting interview:", err)
             alert("Failed to start interview. See console for details.")
