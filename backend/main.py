@@ -7,10 +7,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://ai-mock-interview-platform-mu.vercel.app"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -19,9 +17,6 @@ app.add_middleware(
 app.include_router(interview_router)
 app.include_router(deepgram_router)
 
-@app.get("/")
-def homepage():
-   return {"message": "AI Based Mock Interview Platform"}
 
 
 
