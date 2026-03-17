@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
+// import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { startInterview } from "../services/api"
+import { useState } from "react"
+// import { startInterview } from "../services/api"
 import QuestionCard from "./QuestionCard"
 import "../style/interview.css"
 
@@ -9,27 +10,19 @@ const Interview = () => {
   const navigate = useNavigate()
 
   const role = location.state?.role
+  const level = location.state?.level
 
-  const [questions, setQuestions] = useState([])
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
   const [isRecording, setIsRecording] = useState(false)
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const data = await startInterview(role)
-        const questionArray = data.questions
-          .split("\n")
-          .filter(q => q.trim() !== "")
-          .map(q => q.replace(/^Q\d+\.\s*/, ""))
-        setQuestions(questionArray)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchQuestions()
-  }, [role])
+
+  const [questions, setQuestions] = useState(location.state?.questions
+    ? location.state.questions
+      .split("\n")
+      .filter(q => q.trim() !== "")
+      .map(q => q.replace(/^Q\d+\.\s*/, ""))
+    : [])
 
   const saveAnswer = (answer) => {
     const updated = [...answers]
@@ -51,7 +44,11 @@ const Interview = () => {
     const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: role, interview_data: answers })
+      body: JSON.stringify({
+        role: role,
+        level: level,
+        interview_data: answers
+      })
     })
     const data = await response.json()
     navigate("/feedback", { state: { feedback: data.feedback } })
@@ -78,6 +75,7 @@ const Interview = () => {
       <div className="interview-header">
         <p className="interview-role-label">AI Mock Interview</p>
         <h1 className="interview-title">{role} Interview</h1>
+        <p className="interview-level">{level}</p>
       </div>
 
 
