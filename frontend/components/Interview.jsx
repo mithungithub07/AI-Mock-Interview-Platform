@@ -91,11 +91,20 @@ const Interview = () => {
         <div className="progress-info">
           <span>Question {currentQuestion + 1} of {questions.length}</span>
           <span>{progress}%</span>
+          <span
+            className={
+              timeLeft <= 10 ? "timer-critical" :
+                timeLeft <= 20 ? "timer-warning" : "timer-safe"
+            }
+          >
+            ⏱ {timeLeft}s
+          </span>
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${progress}%` }} />
         </div>
       </div>
+
 
       {/* Timer display */}
       <div className="timer">

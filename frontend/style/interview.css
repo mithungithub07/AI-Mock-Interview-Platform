@@ -501,26 +501,26 @@
   margin-top: 0.3rem;
 }
 
-.timer {
-  margin: 10px 0;
-  font-size: 18px;
+.timer-safe {
+  color: #007bff; /* calm blue */
   font-weight: bold;
-  text-align: center;
+  margin-left: 15px;
 }
 
-.timer span {
-  background: #f9d6d5;
-  padding: 6px 12px;
-  border-radius: 6px;
-  color: #d9534f; /* default red */
-  transition: all 0.3s ease;
-}
-
-/* Flash effect in last 10 seconds */
 .timer-warning {
-  animation: flash 1s infinite;
-  background: #d9534f;
+  color: #ff9800; /* orange alert */
+  font-weight: bold;
+  margin-left: 15px;
+}
+
+.timer-critical {
   color: #fff;
+  background: #d9534f;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  margin-left: 15px;
+  animation: flash 1s infinite;
 }
 
 @keyframes flash {
