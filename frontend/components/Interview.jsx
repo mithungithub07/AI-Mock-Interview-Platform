@@ -1,4 +1,3 @@
-// import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import QuestionCard from "./QuestionCard"
@@ -16,12 +15,9 @@ const Interview = () => {
   const [isRecording, setIsRecording] = useState(false)
 
 
-  const [questions, setQuestions] = useState(location.state?.questions
-    ? location.state.questions
-      .split("\n")
-      .filter(q => q.trim() !== "")
-      .map(q => q.replace(/^Q\d+\.\s*/, ""))
-    : [])
+  const [questions, setQuestions] = useState(
+    Array.isArray(location.state?.questions) ? location.state.questions : []
+  )
 
   const saveAnswer = (answer) => {
     const updated = [...answers]
@@ -32,12 +28,8 @@ const Interview = () => {
     setAnswers(updated)
   }
 
-  const nextQuestion = () => {
-    setCurrentQuestion(currentQuestion + 1)
-  }
-  const prevQuestion = () => {
-    setCurrentQuestion(currentQuestion - 1)
-  }
+  const nextQuestion = () => setCurrentQuestion(currentQuestion + 1)
+  const prevQuestion = () => setCurrentQuestion(currentQuestion - 1)
 
   const submitInterview = async () => {
     const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
@@ -69,14 +61,11 @@ const Interview = () => {
 
   return (
     <div className="interview-page">
-
-
       <div className="interview-header">
         <p className="interview-role-label">AI Mock Interview</p>
         <h1 className="interview-title">{role} Interview</h1>
         <p className="interview-level">{level}</p>
       </div>
-
 
       <div className="interview-progress">
         <div className="progress-info">
@@ -88,7 +77,6 @@ const Interview = () => {
         </div>
       </div>
 
-
       <div className="interview-card">
         <div className="question-badge">Question {currentQuestion + 1}</div>
         <QuestionCard
@@ -99,7 +87,6 @@ const Interview = () => {
           setIsRecording={setIsRecording}
         />
       </div>
-
 
       <div className="interview-nav">
         <span className="nav-hint">
@@ -124,7 +111,6 @@ const Interview = () => {
           )}
         </div>
       </div>
-
     </div>
   )
 }

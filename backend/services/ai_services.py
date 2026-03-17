@@ -21,13 +21,10 @@ def generate_questions(role: str, level: str):
                 {"role": "user", "content": prompt}
             ]
         )
-
-        return response.choices[0].message.content
+        questions_text = response.choices[0].message.content or ""
+        questions = [q.strip() for q in questions_text.split("\n") if q.strip()]
+        return questions
 
     except Exception as e:
         print("ERROR:", e)
-        return {
-            "error": str(e),
-            "role": role,
-            "questions": []
-            }
+        return []
