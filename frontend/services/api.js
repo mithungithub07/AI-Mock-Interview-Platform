@@ -4,7 +4,7 @@ const API = axios.create({
   baseURL: "https://ai-mock-interview-platform-pryk.onrender.com"
 })
 
-export const startInterview = async (role) => {
+export const startInterview = async (role, level) => {
 
   const response = await API.post("/start-interview", {
     role: role,
