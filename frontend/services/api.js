@@ -7,7 +7,8 @@ const API = axios.create({
 export const startInterview = async (role) => {
 
   const response = await API.post("/start-interview", {
-    role: role
+    role: role,
+    level: level
   })
 
   return response.data

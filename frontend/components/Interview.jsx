@@ -1,7 +1,7 @@
 // import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useState } from "react"
-// import { startInterview } from "../services/api"
+//import { startInterview } from "../services/api"
 import QuestionCard from "./QuestionCard"
 import "../style/interview.css"
 
