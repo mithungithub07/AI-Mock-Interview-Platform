@@ -109,7 +109,7 @@ const Interview = () => {
       {/* Timer display */}
       <div className="timer">
         <span className={timeLeft <= 10 ? "timer-warning" : ""}>
-          ⏱ Time left: {timeLeft}s
+          ⏱ {timeLeft}s
         </span>
       </div>
 
