@@ -10,7 +10,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 def generate_questions(role: str, level: str):
-    return get_questions_from_json(role, level, count=5)
+    return get_questions_from_json(role, level, count=15)
 
 
 def generate_feedback_ai(role: str, interview_data):

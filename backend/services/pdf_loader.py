@@ -3,8 +3,12 @@ import json
 import os
 import random
 
-QUESTIONS_JSON = "questions.json"
-PDFS_FOLDER = "pdfs"
+
+# Add this at the top of pdf_loader.py
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+QUESTIONS_JSON = os.path.join(BASE_DIR, "questions.json")
+PDFS_FOLDER = os.path.join(BASE_DIR, "pdfs")
+
 
 # Map role name → folder name
 ROLE_FOLDER_MAP = {
