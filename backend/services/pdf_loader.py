@@ -3,12 +3,9 @@ import json
 import os
 import random
 
-
-# Add this at the top of pdf_loader.py
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QUESTIONS_JSON = os.path.join(BASE_DIR, "questions.json")
 PDFS_FOLDER = os.path.join(BASE_DIR, "pdfs")
-
 
 # Map role name → folder name
 ROLE_FOLDER_MAP = {
@@ -26,9 +23,6 @@ ROLE_PDF_MAP = {
     "fullstack": "Full_Stack_Interview_Questions.pdf",
 }
 
-# Level headings as they appear in the PDF
-LEVEL_HEADINGS = ["Fresher Level", "Junior Level", "Senior Level", "Architect Level"]
-
 LEVEL_MAP = {
     "fresher":   "Fresher Level",
     "junior":    "Junior Level",
@@ -36,12 +30,16 @@ LEVEL_MAP = {
     "architect": "Architect Level",
 }
 
+# Normalize frontend role names to questions.json keys
+ROLE_NAME_MAP = {
+    "java developer": "java",
+    "python developer": "python",
+    "react developer": "react",
+    "full stack developer": "fullstack",
+}
+
 
 def extract_questions_by_level(pdf_path: str) -> dict:
-    """
-    Extract questions from a single PDF that contains all 4 levels.
-    Returns a dict: { "fresher": [...], "junior": [...], "senior": [...], "architect": [...] }
-    """
     result = {level: [] for level in LEVEL_MAP.keys()}
     current_level = None
 
@@ -72,7 +70,6 @@ def extract_questions_by_level(pdf_path: str) -> dict:
 
                     # Extract question lines
                     if current_level and line.endswith("?") and len(line) > 15:
-                        # Clean up Q1. Q2. prefixes if present
                         if line[:2].upper().startswith("Q") and "." in line[:4]:
                             line = line[line.index(".") + 1:].strip()
                         if line and line not in result[current_level]:
@@ -85,10 +82,6 @@ def extract_questions_by_level(pdf_path: str) -> dict:
 
 
 def build_questions_json():
-    """
-    Run this once after adding PDFs.
-    Extracts all questions from PDFs (by level) and saves to questions.json.
-    """
     data = {}
     roles = ["java", "python", "react", "fullstack"]
 
@@ -113,16 +106,14 @@ def build_questions_json():
 
 
 def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
-    """
-    Load questions from questions.json for the given role and level.
-    Returns a random selection of `count` questions.
-    Falls back to empty list if not found (AI generation will kick in).
-    """
     try:
         with open(QUESTIONS_JSON, "r") as f:
             data = json.load(f)
 
-        questions = data.get(role.lower(), {}).get(level.lower(), [])
+        # Normalize role name from frontend to questions.json key
+        normalized_role = ROLE_NAME_MAP.get(role.lower(), role.lower())
+
+        questions = data.get(normalized_role, {}).get(level.lower(), [])
 
         if not questions:
             print(f"⚠️  No questions found for {role}/{level} in questions.json")
@@ -133,5 +124,5 @@ def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
         return selected
 
     except FileNotFoundError:
-        print("⚠️  questions.json not found, falling back to AI generation")
+        print("⚠️  questions.json not found")
         return []

@@ -64,7 +64,7 @@
 # {numbered_format}
 # """
 
-QUESTION_COUNT = 5
+QUESTION_COUNT = 15
 
 def interview_feedback_prompt(role: str, interview_data) -> str:
 
