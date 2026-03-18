@@ -5,8 +5,8 @@ const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
     "?model=nova-2",
     "&language=en-IN",
-    "&punctuate=true",
-    "&smart_format=true",
+    "&punctuate=false",
+    "&smart_format=false",
     "&no_delay=true",
     "&endpointing=150",
 ].join("")
