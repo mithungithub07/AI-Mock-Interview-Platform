@@ -11,29 +11,60 @@ const DEEPGRAM_URL = [
     "&endpointing=150",
 ].join("")
 
-const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
+const AUDIO_CONSTRAINTS = {
+    channelCount: 1,
+    sampleRate: 16000,
+    echoCancellation: true,
+    noiseSuppression: true,
+    autoGainControl: true,
+    latency: 0,
+}
 
+const MIME_TYPE = [
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    "audio/ogg;codecs=opus",
+].find(t => MediaRecorder.isTypeSupported(t)) || "audio/webm"
+
+// Tech term corrections for Indian English mishearings
+const TECH_CORRECTIONS = {
+    "topple": "tuple",
+    "accept": "except",
+    "que": "queue",
+    "pollen": "polling",
+    "reacts": "React",
+    "java script": "JavaScript",
+    "get": "Git",
+    "pie thon": "Python",
+}
+
+const applyCorrections = (text) => {
+    let result = text
+    Object.entries(TECH_CORRECTIONS).forEach(([wrong, correct]) => {
+        const regex = new RegExp(`\\b${wrong}\\b`, "gi")
+        result = result.replace(regex, correct)
+    })
+    return result
+}
+
+const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
     const [answer, setAnswer] = useState("")
     const [listening, setListening] = useState(false)
     const [status, setStatus] = useState("idle")
-    const [isEditing, setIsEditing] = useState(false)  // ← edit state
+    const [isEditing, setIsEditing] = useState(false)
 
     const socketRef = useRef(null)
     const mediaRecorderRef = useRef(null)
     const answerRef = useRef("")
-    const silenceTimer = useRef(null)
 
     useEffect(() => { answerRef.current = answer }, [answer])
     useEffect(() => () => stopAll(), [])
 
     const stopAll = () => {
-        clearTimeout(silenceTimer.current)
         if (mediaRecorderRef.current?.state !== "inactive") {
             try { mediaRecorderRef.current?.stop() } catch { }
         }
-        mediaRecorderRef.current?.stream
-            ?.getTracks()
-            ?.forEach(t => t.stop())
+        mediaRecorderRef.current?.stream?.getTracks()?.forEach(t => t.stop())
         if (socketRef.current?.readyState === WebSocket.OPEN) {
             socketRef.current.close()
         }
@@ -43,32 +74,30 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         onAnswer(answerRef.current.trim())
     }
 
+    const appendTranscript = (transcript) => {
+        const corrected = applyCorrections(transcript)
+        setAnswer(prev => {
+            const updated = prev ? prev + " " + corrected : corrected
+            answerRef.current = updated
+            return updated
+        })
+    }
+
     const startRecording = async () => {
         if (listening) return
         setStatus("connecting")
+
         try {
-            const tokenRes = await axios.get("https://ai-mock-interview-platform-pryk.onrender.com/deepgram-token")
+            const tokenRes = await axios.get(
+                "https://ai-mock-interview-platform-pryk.onrender.com/deepgram-token"
+            )
             const token = tokenRes.data.token
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    channelCount: 1,
-                    sampleRate: 16000,
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    latency: 0,          // ← add this
-                    suppressLocalAudioPlayback: true  // ← add this
-                }
+                audio: AUDIO_CONSTRAINTS
             })
 
-            const mimeType = [
-                "audio/webm;codecs=opus",
-                "audio/webm",
-                "audio/ogg;codecs=opus",
-            ].find(t => MediaRecorder.isTypeSupported(t)) || "audio/webm"
-
-            const mediaRecorder = new MediaRecorder(stream, { mimeType })
+            const mediaRecorder = new MediaRecorder(stream, { mimeType: MIME_TYPE })
             mediaRecorderRef.current = mediaRecorder
 
             const socket = new WebSocket(DEEPGRAM_URL, ["token", token])
@@ -78,24 +107,20 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 setStatus("live")
                 setListening(true)
                 setIsRecording(true)
-                mediaRecorder.start(50)
+                mediaRecorder.start(100)
             }
 
             socket.onmessage = (msg) => {
                 const data = JSON.parse(msg.data)
+
                 if (data.type === "Results") {
-                    const alt = data.channel?.alternatives?.[0]
-                    if (!alt?.transcript) return
-                    const transcript = alt.transcript.trim()
+                    const transcript = data.channel?.alternatives?.[0]?.transcript?.trim()
                     if (!transcript) return
                     if (data.speech_final) {
-                        setAnswer(prev => {
-                            const updated = prev ? prev + " " + transcript : transcript
-                            answerRef.current = updated
-                            return updated
-                        })
+                        appendTranscript(transcript)
                     }
                 }
+
                 if (data.type === "UtteranceEnd") {
                     finaliseAnswer()
                 }
@@ -109,12 +134,12 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
             }
 
             socket.onclose = () => {
-                if (status === "live") setStatus("idle")
+                setStatus(prev => prev === "live" ? "idle" : prev)
             }
 
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-                    socket.send(event.data)
+            mediaRecorder.ondataavailable = ({ data }) => {
+                if (data.size > 0 && socket.readyState === WebSocket.OPEN) {
+                    socket.send(data)
                 }
             }
 
@@ -151,7 +176,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         setStatus("idle")
     }
 
-
     const handleEdit = (e) => {
         setAnswer(e.target.value)
         answerRef.current = e.target.value
@@ -172,9 +196,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
     return (
         <div className="qcard">
-
             <h3 className="qcard-number">Question {index + 1}</h3>
-
             <p className="qcard-question">{question}</p>
 
             {statusLabel && (
@@ -182,7 +204,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                     {statusLabel}
                 </p>
             )}
-
 
             {!listening ? (
                 <button
@@ -200,7 +221,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
             <p className="qcard-answer-label"><strong>Your Answer</strong></p>
 
-
             {isEditing ? (
                 <textarea
                     className="qcard-answer-edit"
@@ -215,12 +235,10 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 </p>
             )}
 
-
             <div className="qcard-btn-row">
                 <button className="qcard-btn-reset" onClick={resetRecording}>
                     Reset Answer
                 </button>
-
 
                 {answer && !listening && (
                     isEditing ? (
@@ -234,7 +252,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                     )
                 )}
             </div>
-
         </div>
     )
 }
