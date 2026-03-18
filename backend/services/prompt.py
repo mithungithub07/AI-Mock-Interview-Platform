@@ -1,71 +1,70 @@
-#Configuration 
-import random
+# import random
+
+# topic_angles = [
+#     "focus on fundamentals",
+#     "real-world scenarios",
+#     "common pitfalls",
+#     "best practices",
+#     "conceptual clarity",
+#     "trade-offs and decision making"
+# ]
+
+# def interview_question_prompt(role: str, level: str) -> str:
+
+#     level_guide = {
+#         "fresher":   "basic concepts, definitions, simple differences",
+#         "junior":    "practical usage, common patterns, basic problem solving",
+#         "senior":    "deep understanding, best practices, performance, trade-offs",
+#         "architect": "system thinking, design decisions, scalability, leadership",
+#     }
+
+#     difficulty = {
+#         "Basic":        int(QUESTION_COUNT * 0.6),
+#         "Intermediate": int(QUESTION_COUNT * 0.3),
+#         "Hard":         QUESTION_COUNT - int(QUESTION_COUNT * 0.6) - int(QUESTION_COUNT * 0.3),
+#     }
+
+#     difficulty_lines = "\n".join(
+#         f"- {count} {level} question{'s' if count > 1 else ''}"
+#         for level, count in difficulty.items()
+#         if count > 0
+#     )
+
+#     numbered_format = "\n".join(
+#         f"Q{i}. <question>" for i in range(1, QUESTION_COUNT + 1)
+#     )
+
+#     random_angle = random.choice(topic_angles)
+#     random_seed  = random.randint(1, 99999)
+
+#     return f"""
+# You are an AI interviewer. Session ID: {random_seed}
+
+# Generate exactly {QUESTION_COUNT} UNIQUE interview questions for the role: {role}.
+# Candidate level: {level}
+# Level focus: {level_guide.get(level, "general concepts")}
+# Session angle: {random_angle}
+
+# Difficulty distribution:
+# {difficulty_lines}
+
+# Rules:
+# - Match question complexity to the candidate level.
+# - Questions must be commonly asked in real interviews.
+# - Each question must be under 20 words.
+# - ALL questions must be answerable VERBALLY in a spoken interview.
+# - Do NOT ask "implement", "write", "design", "build", "create", or "code" questions.
+# - Ask concept-based, experience-based, or explanation-based questions only.
+# - NEVER repeat questions — always generate fresh questions.
+
+# STRICT OUTPUT RULES:
+# - Output ONLY the questions — no intro, no explanation, no extra text.
+
+# Output format (exactly):
+# {numbered_format}
+# """
+
 QUESTION_COUNT = 5
-
-topic_angles = [
-    "focus on fundamentals",
-    "real-world scenarios",
-    "common pitfalls",
-    "best practices",
-    "conceptual clarity",
-    "trade-offs and decision making"
-]
-
-def interview_question_prompt(role: str, level: str) -> str:
-
-    level_guide = {
-        "fresher":   "basic concepts, definitions, simple differences",
-        "junior":    "practical usage, common patterns, basic problem solving",
-        "senior":    "deep understanding, best practices, performance, trade-offs",
-        "architect": "system thinking, design decisions, scalability, leadership",
-    }
-
-    difficulty = {
-        "Basic":        int(QUESTION_COUNT * 0.6),
-        "Intermediate": int(QUESTION_COUNT * 0.3),
-        "Hard":         QUESTION_COUNT - int(QUESTION_COUNT * 0.6) - int(QUESTION_COUNT * 0.3),
-    }
-
-    difficulty_lines = "\n".join(
-        f"- {count} {level} question{'s' if count > 1 else ''}"
-        for level, count in difficulty.items()
-        if count > 0
-    )
-
-    numbered_format = "\n".join(
-        f"Q{i}. <question>" for i in range(1, QUESTION_COUNT + 1)
-    )
-
-    random_angle = random.choice(topic_angles)
-    random_seed  = random.randint(1, 99999)
-
-    return f"""
-You are an AI interviewer. Session ID: {random_seed}
-
-Generate exactly {QUESTION_COUNT} UNIQUE interview questions for the role: {role}.
-Candidate level: {level}
-Level focus: {level_guide.get(level, "general concepts")}
-Session angle: {random_angle}
-
-Difficulty distribution:
-{difficulty_lines}
-
-Rules:
-- Match question complexity to the candidate level.
-- Questions must be commonly asked in real interviews.
-- Each question must be under 20 words.
-- ALL questions must be answerable VERBALLY in a spoken interview.
-- Do NOT ask "implement", "write", "design", "build", "create", or "code" questions.
-- Ask concept-based, experience-based, or explanation-based questions only.
-- NEVER repeat questions — always generate fresh questions.
-
-STRICT OUTPUT RULES:
-- Output ONLY the questions — no intro, no explanation, no extra text.
-
-Output format (exactly):
-{numbered_format}
-"""
-
 
 def interview_feedback_prompt(role: str, interview_data) -> str:
 

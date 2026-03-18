@@ -1,30 +1,30 @@
 import os
 from dotenv import load_dotenv
-from  groq import Groq
-from services.prompt import interview_question_prompt
+from groq import Groq
+from services.prompt import interview_feedback_prompt
+from services.pdf_loader import get_questions_from_json
 
 load_dotenv()
 
-# print("API KEY:", os.getenv("GROQ_API_KEY"))
-
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_questions(role: str, level: str):
 
+def generate_questions(role: str, level: str):
+    return get_questions_from_json(role, level, count=5)
+
+
+def generate_feedback_ai(role: str, interview_data):
     try:
-        
-        prompt = interview_question_prompt(role, level)
+        prompt = interview_feedback_prompt(role, interview_data)
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            temperature=0.9,
+            model="llama-3.3-70b-versatile",
+            temperature=0.3,
             messages=[
                 {"role": "user", "content": prompt}
             ]
         )
-        questions_text = response.choices[0].message.content or ""
-        questions = [q.strip() for q in questions_text.split("\n") if q.strip()]
-        return questions
+        return response.choices[0].message.content or ""
 
     except Exception as e:
-        print("ERROR:", e)
-        return []
+        print("Feedback ERROR:", e)
+        return ""
