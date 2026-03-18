@@ -17,7 +17,6 @@ const AUDIO_CONSTRAINTS = {
     echoCancellation: true,
     noiseSuppression: true,
     autoGainControl: true,
-    latency: 0,
 }
 
 const MIME_TYPE = [
