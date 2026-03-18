@@ -3,12 +3,12 @@ import axios from "axios"
 
 const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
-    "?model=nova-2",
+    "?model=nova-3",
     "&language=en-IN",
     "&punctuate=true",
     "&smart_format=true",
     "&no_delay=true",
-    "&endpointing=200",
+    "&endpointing=150",
 ].join("")
 
 const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
@@ -57,6 +57,8 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
+                    latency: 0,          // ← add this
+                    suppressLocalAudioPlayback: true  // ← add this
                 }
             })
 
