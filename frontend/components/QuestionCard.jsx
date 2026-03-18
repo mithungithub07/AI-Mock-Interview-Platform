@@ -7,12 +7,12 @@ const DEEPGRAM_URL = [
     "&language=en-IN",
     "&punctuate=true",
     "&interim_results=true",
-    "&utterance_end_ms=1000",
+    "&utterance_end_ms=500",
     "&vad_events=true",
     "&smart_format=true",
     "&filler_words=false",
     "&no_delay=true",
-    "&endpointing=300",
+    "&endpointing=200",
 ].join("")
 
 const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
@@ -80,7 +80,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 setStatus("live")
                 setListening(true)
                 setIsRecording(true)
-                mediaRecorder.start(150)
+                mediaRecorder.start(100)
             }
 
             socket.onmessage = (msg) => {
