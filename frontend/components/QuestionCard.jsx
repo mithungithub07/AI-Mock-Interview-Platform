@@ -78,7 +78,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
                 setStatus("live")
                 setListening(true)
                 setIsRecording(true)
-                mediaRecorder.start(100)
+                mediaRecorder.start(50)
             }
 
             socket.onmessage = (msg) => {
