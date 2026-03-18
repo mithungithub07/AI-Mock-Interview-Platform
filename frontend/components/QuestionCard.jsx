@@ -6,11 +6,7 @@ const DEEPGRAM_URL = [
     "?model=nova-2",
     "&language=en-IN",
     "&punctuate=true",
-    "&interim_results=true",
-    "&utterance_end_ms=500",
-    "&vad_events=true",
     "&smart_format=true",
-    "&filler_words=false",
     "&no_delay=true",
     "&endpointing=200",
 ].join("")
