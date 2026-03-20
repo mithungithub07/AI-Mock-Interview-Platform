@@ -25,7 +25,6 @@ const MIME_TYPE = [
     "audio/ogg;codecs=opus",
 ].find(t => MediaRecorder.isTypeSupported(t)) || "audio/webm"
 
-// Tech term corrections for Indian English mishearings
 const TECH_CORRECTIONS = {
     "topple": "tuple",
     "accept": "except",

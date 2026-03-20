@@ -54,7 +54,7 @@ const Home = () => {
                             selectedRoles={selectedRole}
                             setRole={setSelectedRole}
                         />
-                        {/* Level dropdown */}
+
                         <select
                             className="level-select"
                             value={selectedLevel}

@@ -28,7 +28,6 @@ const Interview = () => {
     return Array.isArray(location.state?.questions) ? location.state.questions : []
   })
 
-  // Save to sessionStorage whenever these change
   useEffect(() => {
     if (questions.length > 0) {
       sessionStorage.setItem("questions", JSON.stringify(questions))
