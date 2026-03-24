@@ -7,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QUESTIONS_JSON = os.path.join(BASE_DIR, "questions.json")
 PDFS_FOLDER = os.path.join(BASE_DIR, "pdfs")
 
-# Map role name → folder name
+
 ROLE_FOLDER_MAP = {
     "java": "java_developer",
     "python": "python",
@@ -15,7 +15,7 @@ ROLE_FOLDER_MAP = {
     "fullstack": "fullstack",
 }
 
-# Map role name → PDF filename
+
 ROLE_PDF_MAP = {
     "java": "Java_Interview_Questions.pdf",
     "python": "Python_Interview_Questions.pdf",
@@ -30,7 +30,7 @@ LEVEL_MAP = {
     "architect": "Architect Level",
 }
 
-# Normalize frontend role names to questions.json keys
+
 ROLE_NAME_MAP = {
     "java developer": "java",
     "python developer": "python",
@@ -57,7 +57,7 @@ def extract_questions_by_level(pdf_path: str) -> dict:
                     if not line:
                         continue
 
-                    # Detect level heading
+        
                     matched_level = None
                     for level_key, heading in LEVEL_MAP.items():
                         if heading.lower() in line.lower():
@@ -68,7 +68,7 @@ def extract_questions_by_level(pdf_path: str) -> dict:
                         current_level = matched_level
                         continue
 
-                    # Extract question lines
+           
                     if current_level and line.endswith("?") and len(line) > 15:
                         if line[:2].upper().startswith("Q") and "." in line[:4]:
                             line = line[line.index(".") + 1:].strip()
@@ -94,15 +94,15 @@ def build_questions_json():
             level_questions = extract_questions_by_level(pdf_path)
             data[role] = level_questions
             for level, qs in level_questions.items():
-                print(f"✅ {role}/{level} → {len(qs)} questions extracted")
+                print(f"{role}/{level} → {len(qs)} questions extracted")
         else:
-            print(f"⚠️  PDF not found: {pdf_path}")
+            print(f"PDF not found: {pdf_path}")
             data[role] = {level: [] for level in LEVEL_MAP.keys()}
 
     with open(QUESTIONS_JSON, "w") as f:
         json.dump(data, f, indent=2)
 
-    print(f"\n✅ questions.json saved!")
+    print(f"\n questions.json saved!")
 
 
 def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
@@ -110,19 +110,18 @@ def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
         with open(QUESTIONS_JSON, "r") as f:
             data = json.load(f)
 
-        # Normalize role name from frontend to questions.json key
         normalized_role = ROLE_NAME_MAP.get(role.lower(), role.lower())
 
         questions = data.get(normalized_role, {}).get(level.lower(), [])
 
         if not questions:
-            print(f"⚠️  No questions found for {role}/{level} in questions.json")
+            print(f" No questions found for {role}/{level} in questions.json")
             return []
 
         selected = random.sample(questions, min(count, len(questions)))
-        print(f"✅ Loaded {len(selected)} questions for {role}/{level} from PDF bank")
+        print(f" Loaded {len(selected)} questions for {role}/{level} from PDF bank")
         return selected
 
     except FileNotFoundError:
-        print("⚠️  questions.json not found")
+        print(" questions.json not found")
         return []
