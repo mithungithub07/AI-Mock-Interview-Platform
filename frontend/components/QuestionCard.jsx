@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import CodeEditor from './CodeEditor'
+import '../style/codeeditor.css'  // ✅ ADD THIS IMPORT
 
 const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
@@ -61,30 +62,43 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
     useEffect(() => { answerRef.current = answer }, [answer])
     useEffect(() => () => stopAll(), [])
 
-    // Detect if this is a coding question
+    // ✅ FIXED: Better coding question detection (excluding "implement")
     useEffect(() => {
         const codingKeywords = [
-            'write', 'implement', 'code', 'program', 'create a function',
-            'write code', 'solve', 'algorithm', 'write a method', 'write a program',
-            'implement a', 'create a', 'build a', 'develop a'
+            'write a program', 'write code', 'write a function', 'write a method',
+            'create a function', 'create a method', 'create a program',
+            'solve', 'algorithm to', 'code to', 'code for',
+            'find the', 'calculate', 'reverse a', 'sort an array',
+            'check if', 'count', 'merge two', 'flatten a'
         ]
 
         const isJuniorOrSenior = level === 'junior' || level === 'senior'
         const questionLower = question.toLowerCase()
+
+        // Check if question contains coding keywords
         const hasCodingKeyword = codingKeywords.some(keyword =>
             questionLower.includes(keyword)
         )
 
         setIsCodingQuestion(isJuniorOrSenior && hasCodingKeyword)
+
+        // Debug log
+        console.log('Question:', question)
+        console.log('Level:', level)
+        console.log('Is Coding Question:', isJuniorOrSenior && hasCodingKeyword)
     }, [question, level])
 
     // Get programming language based on role
     const getLanguage = () => {
         const languageMap = {
             'java': 'java',
+            'java developer': 'java',
             'python': 'python',
+            'python developer': 'python',
             'react': 'javascript',
-            'fullstack': 'javascript'
+            'react developer': 'javascript',
+            'fullstack': 'javascript',
+            'full stack developer': 'javascript'
         }
         return languageMap[role?.toLowerCase()] || 'javascript'
     }
@@ -241,10 +255,10 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
             <h3 className="qcard-number">Question {index + 1}</h3>
             <p className="qcard-question">{question}</p>
 
-            {/* Coding Question Badge */}
-            {isCodingQuestion && (
-                <div className="coding-badge">
-                    <span>💻 Coding Question</span>
+            {/* ✅ Coding Question Badge */}
+            {isCodingQuestion && !showCodeEditor && (
+                <div className="coding-badge-container">
+                    <span className="coding-badge">💻 Coding Question</span>
                 </div>
             )}
 
@@ -254,14 +268,16 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
                 </p>
             )}
 
-            {/* Show Code Editor when activated */}
+            {/* ✅ Show Code Editor when activated */}
             {showCodeEditor ? (
-                <CodeEditor
-                    question={question}
-                    language={getLanguage()}
-                    onSubmit={handleCodeSubmit}
-                    initialCode={answer}
-                />
+                <div className="code-editor-wrapper">
+                    <CodeEditor
+                        question={question}
+                        language={getLanguage()}
+                        onSubmit={handleCodeSubmit}
+                        initialCode={answer}
+                    />
+                </div>
             ) : (
                 <>
                     {/* Voice Recording Buttons */}
@@ -316,11 +332,11 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
                         )}
                     </div>
 
-                    {/* Code Editor Button for Coding Questions */}
+                    {/* ✅ Code Editor Button for Coding Questions */}
                     {isCodingQuestion && !listening && (
-                        <div className="code-editor-toggle">
+                        <div className="code-editor-toggle-wrapper">
                             <button
-                                className="btn-open-editor"
+                                className="btn-open-code-editor"
                                 onClick={handleOpenCodeEditor}
                             >
                                 💻 Open Code Editor

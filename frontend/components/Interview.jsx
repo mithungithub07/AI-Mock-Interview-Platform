@@ -77,6 +77,14 @@ const Interview = () => {
   }
 
   const submitInterview = async () => {
+    // ✅ Ensure all answers are saved
+    const finalAnswers = answers.filter(a => a && a.answer && a.answer.trim() !== '')
+
+    if (finalAnswers.length === 0) {
+      alert('Please answer at least one question before submitting')
+      return
+    }
+
     try {
       const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
         method: "POST",
@@ -84,7 +92,7 @@ const Interview = () => {
         body: JSON.stringify({
           role: role,
           level: level,
-          interview_data: answers
+          interview_data: finalAnswers  // ✅ Send only non-empty answers
         })
       })
 
@@ -93,7 +101,7 @@ const Interview = () => {
       }
 
       const data = await response.json()
-      sessionStorage.clear() // clear on submit
+      sessionStorage.clear()
       navigate("/feedback", { state: { feedback: data.feedback } })
     } catch (error) {
       console.error('Submit interview error:', error)
