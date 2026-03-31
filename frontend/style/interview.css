@@ -528,3 +528,114 @@
   50% { opacity: 0.3; }
   100% { opacity: 1; }
 }
+
+/* Coding Question Badge */
+.coding-badge {
+    display: inline-block;
+    margin: 12px 0 16px 0;
+}
+
+.coding-badge span {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Code Editor Toggle Button */
+.code-editor-toggle {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-open-editor {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-open-editor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-open-editor:active {
+    transform: translateY(0);
+}
+
+/* Answer Stats */
+.answer-stats {
+    text-align: right;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Enhanced Answer Text Display */
+.qcard-answer-text {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    min-height: 80px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #495057;
+}
+
+.qcard-answer-text.has-answer {
+    background: #fff;
+    border-color: #28a745;
+    color: #212529;
+}
+
+/* Enhanced Edit Textarea */
+.qcard-answer-edit {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 150px;
+    transition: all 0.3s;
+}
+
+.qcard-answer-edit:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .btn-open-editor {
+        max-width: 100%;
+        font-size: 14px;
+        padding: 12px 24px;
+    }
+
+    .coding-badge span {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+}

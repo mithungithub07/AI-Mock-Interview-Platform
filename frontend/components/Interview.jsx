@@ -139,6 +139,8 @@ const Interview = () => {
           index={currentQuestion}
           onAnswer={saveAnswer}
           setIsRecording={setIsRecording}
+          role={role}
+          level={level}
         />
       </div>
 

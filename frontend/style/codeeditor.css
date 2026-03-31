@@ -1,0 +1,140 @@
+.code-editor-container {
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  margin: 20px 0;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2d2d30;
+  padding: 12px 20px;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.editor-title .icon {
+  font-size: 18px;
+}
+
+.language-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.editor-wrapper {
+  background: #1e1e1e;
+  border: 2px solid #3e3e42;
+  border-radius: 0;
+}
+
+.editor-controls {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #2d2d30;
+  border-top: 1px solid #3e3e42;
+}
+
+.editor-controls button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex: 1;
+}
+
+.btn-run {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.btn-run:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-run:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-reset {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-reset:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.output-console {
+  background: #252526;
+  border-top: 1px solid #3e3e42;
+  margin-top: 0;
+}
+
+.console-header {
+  background: #2d2d30;
+  padding: 8px 20px;
+  color: #ccc;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.console-content {
+  color: #d4d4d4;
+  padding: 16px 20px;
+  margin: 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .editor-wrapper {
+    height: 300px;
+  }
+
+  .editor-controls {
+    flex-direction: column;
+  }
+
+  .editor-controls button {
+    width: 100%;
+  }
+}

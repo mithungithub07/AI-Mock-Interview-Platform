@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
+import CodeEditor from './CodeEditor'
 
 const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
@@ -45,11 +46,13 @@ const applyCorrections = (text) => {
     return result
 }
 
-const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
+const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }) => {
     const [answer, setAnswer] = useState("")
     const [listening, setListening] = useState(false)
     const [status, setStatus] = useState("idle")
     const [isEditing, setIsEditing] = useState(false)
+    const [isCodingQuestion, setIsCodingQuestion] = useState(false)
+    const [showCodeEditor, setShowCodeEditor] = useState(false)
 
     const socketRef = useRef(null)
     const mediaRecorderRef = useRef(null)
@@ -57,6 +60,34 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
 
     useEffect(() => { answerRef.current = answer }, [answer])
     useEffect(() => () => stopAll(), [])
+
+    // Detect if this is a coding question
+    useEffect(() => {
+        const codingKeywords = [
+            'write', 'implement', 'code', 'program', 'create a function',
+            'write code', 'solve', 'algorithm', 'write a method', 'write a program',
+            'implement a', 'create a', 'build a', 'develop a'
+        ]
+
+        const isJuniorOrSenior = level === 'junior' || level === 'senior'
+        const questionLower = question.toLowerCase()
+        const hasCodingKeyword = codingKeywords.some(keyword =>
+            questionLower.includes(keyword)
+        )
+
+        setIsCodingQuestion(isJuniorOrSenior && hasCodingKeyword)
+    }, [question, level])
+
+    // Get programming language based on role
+    const getLanguage = () => {
+        const languageMap = {
+            'java': 'java',
+            'python': 'python',
+            'react': 'javascript',
+            'fullstack': 'javascript'
+        }
+        return languageMap[role?.toLowerCase()] || 'javascript'
+    }
 
     const stopAll = () => {
         if (mediaRecorderRef.current?.state !== "inactive") {
@@ -171,6 +202,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
         setListening(false)
         setIsRecording(false)
         setIsEditing(false)
+        setShowCodeEditor(false)
         setStatus("idle")
     }
 
@@ -182,6 +214,18 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
     const saveEdit = () => {
         setIsEditing(false)
         onAnswer(answer)
+    }
+
+    const handleCodeSubmit = (code) => {
+        setAnswer(code)
+        answerRef.current = code
+        setShowCodeEditor(false)
+        onAnswer(code)
+    }
+
+    const handleOpenCodeEditor = () => {
+        setShowCodeEditor(true)
+        setIsEditing(false)
     }
 
     const statusLabel = {
@@ -197,59 +241,101 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording }) => {
             <h3 className="qcard-number">Question {index + 1}</h3>
             <p className="qcard-question">{question}</p>
 
+            {/* Coding Question Badge */}
+            {isCodingQuestion && (
+                <div className="coding-badge">
+                    <span>💻 Coding Question</span>
+                </div>
+            )}
+
             {statusLabel && (
                 <p className={`qcard-status ${status === "error" ? "qcard-status-error" : ""}`}>
                     {statusLabel}
                 </p>
             )}
 
-            {!listening ? (
-                <button
-                    className="qcard-btn-record"
-                    onClick={startRecording}
-                    disabled={status === "connecting" || status === "stopping"}
-                >
-                    {status === "connecting" ? "Connecting..." : "Start Recording"}
-                </button>
-            ) : (
-                <button className="qcard-btn-record qcard-btn-recording" onClick={stopRecording}>
-                    Stop Recording
-                </button>
-            )}
-
-            <p className="qcard-answer-label"><strong>Your Answer</strong></p>
-
-            {isEditing ? (
-                <textarea
-                    className="qcard-answer-edit"
-                    value={answer}
-                    onChange={handleEdit}
-                    rows={4}
-                    autoFocus
+            {/* Show Code Editor when activated */}
+            {showCodeEditor ? (
+                <CodeEditor
+                    question={question}
+                    language={getLanguage()}
+                    onSubmit={handleCodeSubmit}
+                    initialCode={answer}
                 />
             ) : (
-                <p className={`qcard-answer-text ${answer ? "has-answer" : ""}`}>
-                    {answer || "No answer recorded yet"}
-                </p>
-            )}
-
-            <div className="qcard-btn-row">
-                <button className="qcard-btn-reset" onClick={resetRecording}>
-                    Reset Answer
-                </button>
-
-                {answer && !listening && (
-                    isEditing ? (
-                        <button className="qcard-btn-save" onClick={saveEdit}>
-                            Save Answer
+                <>
+                    {/* Voice Recording Buttons */}
+                    {!listening ? (
+                        <button
+                            className="qcard-btn-record"
+                            onClick={startRecording}
+                            disabled={status === "connecting" || status === "stopping"}
+                        >
+                            {status === "connecting" ? "Connecting..." : "🎤 Start Recording"}
                         </button>
                     ) : (
-                        <button className="qcard-btn-edit" onClick={() => setIsEditing(true)}>
-                            Edit Answer
+                        <button className="qcard-btn-record qcard-btn-recording" onClick={stopRecording}>
+                            ⏹️ Stop Recording
                         </button>
-                    )
-                )}
-            </div>
+                    )}
+
+                    <p className="qcard-answer-label"><strong>Your Answer</strong></p>
+
+                    {/* Answer Display/Edit */}
+                    {isEditing ? (
+                        <textarea
+                            className="qcard-answer-edit"
+                            value={answer}
+                            onChange={handleEdit}
+                            rows={8}
+                            autoFocus
+                            placeholder="Type your answer here..."
+                        />
+                    ) : (
+                        <p className={`qcard-answer-text ${answer ? "has-answer" : ""}`}>
+                            {answer || "No answer recorded yet"}
+                        </p>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="qcard-btn-row">
+                        <button className="qcard-btn-reset" onClick={resetRecording}>
+                            🔄 Reset Answer
+                        </button>
+
+                        {answer && !listening && (
+                            isEditing ? (
+                                <button className="qcard-btn-save" onClick={saveEdit}>
+                                    ✅ Save Answer
+                                </button>
+                            ) : (
+                                <button className="qcard-btn-edit" onClick={() => setIsEditing(true)}>
+                                    ✏️ Edit Answer
+                                </button>
+                            )
+                        )}
+                    </div>
+
+                    {/* Code Editor Button for Coding Questions */}
+                    {isCodingQuestion && !listening && (
+                        <div className="code-editor-toggle">
+                            <button
+                                className="btn-open-editor"
+                                onClick={handleOpenCodeEditor}
+                            >
+                                💻 Open Code Editor
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
+
+            {/* Character Count */}
+            {answer && !showCodeEditor && (
+                <div className="answer-stats">
+                    {answer.length} characters
+                </div>
+            )}
         </div>
     )
 }
