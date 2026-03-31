@@ -34,7 +34,7 @@ const Interview = () => {
       sessionStorage.setItem("role", role)
       sessionStorage.setItem("level", level)
     }
-  }, [questions])
+  }, [questions, role, level])
 
   useEffect(() => {
     sessionStorage.setItem("currentQuestion", currentQuestion)
@@ -77,18 +77,28 @@ const Interview = () => {
   }
 
   const submitInterview = async () => {
-    const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        role: role,
-        level: level,
-        interview_data: answers
+    try {
+      const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: role,
+          level: level,
+          interview_data: answers
+        })
       })
-    })
-    const data = await response.json()
-    sessionStorage.clear() // clear on submit
-    navigate("/feedback", { state: { feedback: data.feedback } })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate feedback')
+      }
+
+      const data = await response.json()
+      sessionStorage.clear() // clear on submit
+      navigate("/feedback", { state: { feedback: data.feedback } })
+    } catch (error) {
+      console.error('Submit interview error:', error)
+      alert('Failed to submit interview. Please try again.')
+    }
   }
 
   if (questions.length === 0) {
@@ -139,6 +149,8 @@ const Interview = () => {
           index={currentQuestion}
           onAnswer={saveAnswer}
           setIsRecording={setIsRecording}
+          role={role}          // ✅ ADDED: Pass role to QuestionCard
+          level={level}        // ✅ ADDED: Pass level to QuestionCard
         />
       </div>
 
