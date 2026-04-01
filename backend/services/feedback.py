@@ -8,7 +8,7 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_feedback_ai(role, interview_data):
+def generate_feedback_ai(role, level, interview_data):
     print("INTERVIEW DATA RECEIVED:", interview_data)
 
     try:
@@ -16,7 +16,7 @@ def generate_feedback_ai(role, interview_data):
           if not item["answer"] or len(item["answer"].strip()) < 5:
             item["answer"] = "No answer provided"
             
-        prompt = interview_feedback_prompt(role, interview_data)
+        prompt = interview_feedback_prompt(role, level, interview_data)
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",  
