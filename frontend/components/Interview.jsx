@@ -112,6 +112,16 @@ const Interview = () => {
   const submitInterview = async () => {
     const finalAnswers = answers.filter(a => a && a.answer && a.answer.trim() !== '')
 
+    // ✅ LOG WHAT WE'RE SENDING
+    console.log('=== SUBMITTING INTERVIEW ===')
+    console.log('Role:', role)
+    console.log('Level:', level)
+    console.log('Answers count:', finalAnswers.length)
+    console.log('Full data:', {
+      role: role,
+      level: level,
+      interview_data: finalAnswers
+    })
 
     try {
       const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
@@ -124,13 +134,32 @@ const Interview = () => {
         })
       })
 
+      // ✅ LOG THE RESPONSE
+      console.log('Response status:', response.status)
+      console.log('Response ok?:', response.ok)
+
       if (!response.ok) {
+        // ✅ READ AND SHOW THE ACTUAL ERROR
+        const errorText = await response.text()
+        console.error('Backend error response:', errorText)
+
+        try {
+          const errorJson = JSON.parse(errorText)
+          console.error('Parsed error:', errorJson)
+          alert(`Backend Error: ${JSON.stringify(errorJson, null, 2)}`)
+        } catch {
+          alert(`Backend Error (${response.status}): ${errorText}`)
+        }
+
         throw new Error('Failed to generate feedback')
       }
 
       const data = await response.json()
+      console.log('Success! Feedback received:', data)
+
       sessionStorage.clear()
       navigate("/feedback", { state: { feedback: data.feedback } })
+
     } catch (error) {
       console.error('Submit interview error:', error)
       alert('Failed to submit interview. Please try again.')
