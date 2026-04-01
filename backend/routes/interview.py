@@ -23,9 +23,8 @@ def generate_feedback(data: FeedbackRequest):
 
     role = data.role
     interview_data = data.interview_data
-
     level = data.level
-feedback = generate_feedback_ai(role, level, interview_data)
+    feedback = generate_feedback_ai(role, level, interview_data)
 
     return {
         "feedback": feedback

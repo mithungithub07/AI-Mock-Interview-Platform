@@ -13,9 +13,9 @@ def generate_questions(role: str, level: str):
     return get_questions_from_json(role, level, count=25)
 
 
-def generate_feedback_ai(role: str, interview_data):
+def generate_feedback_ai(role: str, level: str, interview_data):
     try:
-        prompt = interview_feedback_prompt(role, interview_data)
+        prompt = interview_feedback_prompt(role, level, interview_data)
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             temperature=0.3,
