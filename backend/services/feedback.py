@@ -10,6 +10,9 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate_feedback_ai(role, level, interview_data):
     print("INTERVIEW DATA RECEIVED:", interview_data)
+    print("INTERVIEW DATA RECEIVED:", interview_data)
+    print("ROLE:", role)
+    print("LEVEL:", level)
 
     try:
         for item in interview_data:
@@ -28,5 +31,5 @@ def generate_feedback_ai(role, level, interview_data):
         return feedback
 
     except Exception as e:
-       
+        print("FEEDBACK ERROR:", e)
         return {"error": "Failed to generate feedback"}
