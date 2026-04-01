@@ -225,39 +225,31 @@
 
 /* ── Start / Stop Recording button ── */
 .qcard-btn-record {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-  font-family: 'Sora', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.4rem;
-  border-radius: 10px;
-  background: rgba(91, 82, 232, 0.14);
-  color: #a89ff7;
-  border: 1px solid rgba(91, 82, 232, 0.35);
-  margin-bottom: 1.4rem;
-  align-self: flex-start;
-  transition: all 0.22s ease;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .qcard-btn-record:hover {
-  background: rgba(91, 82, 232, 0.26);
-  color: #c4bcff;
-  border-color: rgba(91, 82, 232, 0.6);
-  box-shadow: 0 0 18px rgba(91, 82, 232, 0.25);
-  transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
 }
 
-/* Active/recording state — red pulsing glow */
+.qcard-btn-record:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .qcard-btn-recording {
-  background: rgba(239, 68, 68, 0.12) !important;
-  color: #f87171 !important;
-  border-color: rgba(239, 68, 68, 0.4) !important;
-  animation: recordPulse 1.4s ease-in-out infinite;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
 }
 
 @keyframes recordPulse {
@@ -642,8 +634,7 @@
 /* ===== CODING QUESTION STYLES ===== */
 
 .coding-badge-container {
-    margin: 16px 0;
-    text-align: center;
+    display: none !important;
 }
 
 .coding-badge {
