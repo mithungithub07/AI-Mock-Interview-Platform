@@ -1,4 +1,4 @@
-QUESTION_COUNT = 25  # ✅ CHANGED: Now 25 questions per interview
+QUESTION_COUNT = 15  
 
 def interview_feedback_prompt(role: str, level: str, interview_data) -> str:
     return f"""
