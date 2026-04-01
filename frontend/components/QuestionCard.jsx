@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import CodeEditor from './CodeEditor'
-import '../style/codeeditor.css'  // ✅ ADD THIS IMPORT
+import '../style/codeeditor.css'
 
 const DEEPGRAM_URL = [
     "wss://api.deepgram.com/v1/listen",
@@ -62,7 +62,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
     useEffect(() => { answerRef.current = answer }, [answer])
     useEffect(() => () => stopAll(), [])
 
-    // ✅ FIXED: Better coding question detection (excluding "implement")
+    // Detect if this is a coding question
     useEffect(() => {
         const codingKeywords = [
             'write a program', 'write code', 'write a function', 'write a method',
@@ -75,20 +75,13 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
         const isJuniorOrSenior = level === 'junior' || level === 'senior'
         const questionLower = question.toLowerCase()
 
-        // Check if question contains coding keywords
         const hasCodingKeyword = codingKeywords.some(keyword =>
             questionLower.includes(keyword)
         )
 
         setIsCodingQuestion(isJuniorOrSenior && hasCodingKeyword)
-
-        // Debug log
-        console.log('Question:', question)
-        console.log('Level:', level)
-        console.log('Is Coding Question:', isJuniorOrSenior && hasCodingKeyword)
     }, [question, level])
 
-    // Get programming language based on role
     const getLanguage = () => {
         const languageMap = {
             'java': 'java',
@@ -255,7 +248,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
             <h3 className="qcard-number">Question {index + 1}</h3>
             <p className="qcard-question">{question}</p>
 
-            {/* ✅ Coding Question Badge */}
+            {/* Coding Question Badge */}
             {isCodingQuestion && !showCodeEditor && (
                 <div className="coding-badge-container">
                     <span className="coding-badge">💻 Coding Question</span>
@@ -268,7 +261,7 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
                 </p>
             )}
 
-            {/* ✅ Show Code Editor when activated */}
+            {/* Show Code Editor OR Normal Interface */}
             {showCodeEditor ? (
                 <div className="code-editor-wrapper">
                     <CodeEditor
@@ -280,20 +273,32 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
                 </div>
             ) : (
                 <>
-                    {/* Voice Recording Buttons */}
-                    {!listening ? (
-                        <button
-                            className="qcard-btn-record"
-                            onClick={startRecording}
-                            disabled={status === "connecting" || status === "stopping"}
-                        >
-                            {status === "connecting" ? "Connecting..." : "🎤 Start Recording"}
-                        </button>
-                    ) : (
-                        <button className="qcard-btn-record qcard-btn-recording" onClick={stopRecording}>
-                            ⏹️ Stop Recording
-                        </button>
-                    )}
+                    {/* Recording Buttons Row (with Code Editor button if coding question) */}
+                    <div className="recording-buttons-row">
+                        {!listening ? (
+                            <button
+                                className="qcard-btn-record"
+                                onClick={startRecording}
+                                disabled={status === "connecting" || status === "stopping"}
+                            >
+                                {status === "connecting" ? "Connecting..." : "🎤 Start Recording"}
+                            </button>
+                        ) : (
+                            <button className="qcard-btn-record qcard-btn-recording" onClick={stopRecording}>
+                                ⏹️ Stop Recording
+                            </button>
+                        )}
+
+                        {/* Code Editor Button - Same size as Start Recording */}
+                        {isCodingQuestion && !listening && (
+                            <button
+                                className="qcard-btn-code-editor"
+                                onClick={handleOpenCodeEditor}
+                            >
+                                💻 Open Code Editor
+                            </button>
+                        )}
+                    </div>
 
                     <p className="qcard-answer-label"><strong>Your Answer</strong></p>
 
@@ -331,18 +336,6 @@ const QuestionCard = ({ question, index, onAnswer, setIsRecording, role, level }
                             )
                         )}
                     </div>
-
-                    {/* ✅ Code Editor Button for Coding Questions */}
-                    {isCodingQuestion && !listening && (
-                        <div className="code-editor-toggle-wrapper">
-                            <button
-                                className="btn-open-code-editor"
-                                onClick={handleOpenCodeEditor}
-                            >
-                                💻 Open Code Editor
-                            </button>
-                        </div>
-                    )}
                 </>
             )}
 

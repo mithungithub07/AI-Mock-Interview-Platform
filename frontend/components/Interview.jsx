@@ -20,7 +20,11 @@ const Interview = () => {
   })
 
   const [isRecording, setIsRecording] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(60)
+
+  // ✅ NEW: Dynamic timer based on question type
+  const [timeLeft, setTimeLeft] = useState(() => {
+    return parseInt(sessionStorage.getItem("timeLeft") || "60")
+  })
 
   const [questions, setQuestions] = useState(() => {
     const saved = sessionStorage.getItem("questions")
@@ -44,6 +48,37 @@ const Interview = () => {
     sessionStorage.setItem("answers", JSON.stringify(answers))
   }, [answers])
 
+  useEffect(() => {
+    sessionStorage.setItem("timeLeft", timeLeft)
+  }, [timeLeft])
+
+  // ✅ NEW: Check if current question is a coding question
+  const isCodingQuestion = () => {
+    if (!questions[currentQuestion]) return false
+
+    const codingKeywords = [
+      'write a program', 'write code', 'write a function', 'write a method',
+      'create a function', 'create a method', 'create a program',
+      'solve', 'algorithm to', 'code to', 'code for'
+    ]
+
+    const isJuniorOrSenior = level === 'junior' || level === 'senior'
+    const questionLower = questions[currentQuestion].toLowerCase()
+
+    return isJuniorOrSenior && codingKeywords.some(keyword =>
+      questionLower.includes(keyword)
+    )
+  }
+
+  // ✅ NEW: Set timer based on question type when question changes
+  useEffect(() => {
+    if (isCodingQuestion()) {
+      setTimeLeft(1200) // 20 minutes for coding questions
+    } else {
+      setTimeLeft(60) // 60 seconds for theory questions
+    }
+  }, [currentQuestion])
+
   const saveAnswer = (answer) => {
     const updated = [...answers]
     updated[currentQuestion] = {
@@ -58,7 +93,6 @@ const Interview = () => {
     if (timeLeft <= 0) {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1)
-        setTimeLeft(60)
       } else {
         submitInterview()
       }
@@ -73,11 +107,9 @@ const Interview = () => {
 
   const nextQuestion = () => {
     setCurrentQuestion(currentQuestion + 1)
-    setTimeLeft(60)
   }
 
   const submitInterview = async () => {
-    // ✅ Ensure all answers are saved
     const finalAnswers = answers.filter(a => a && a.answer && a.answer.trim() !== '')
 
     if (finalAnswers.length === 0) {
@@ -92,7 +124,7 @@ const Interview = () => {
         body: JSON.stringify({
           role: role,
           level: level,
-          interview_data: finalAnswers  // ✅ Send only non-empty answers
+          interview_data: finalAnswers
         })
       })
 
@@ -123,6 +155,16 @@ const Interview = () => {
   const progress = Math.round(((currentQuestion + 1) / questions.length) * 100)
   const isLast = currentQuestion === questions.length - 1
 
+  // ✅ NEW: Format time display (MM:SS for coding, SS for theory)
+  const formatTime = (seconds) => {
+    if (isCodingQuestion()) {
+      const mins = Math.floor(seconds / 60)
+      const secs = seconds % 60
+      return `${mins}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${seconds}s`
+  }
+
   return (
     <div className="interview-page">
       <div className="interview-header">
@@ -141,7 +183,7 @@ const Interview = () => {
                 timeLeft <= 20 ? "timer-warning" : "timer-safe"
             }
           >
-            ⏱ {timeLeft}s
+            ⏱ {formatTime(timeLeft)}
           </span>
         </div>
         <div className="progress-track">
@@ -157,8 +199,8 @@ const Interview = () => {
           index={currentQuestion}
           onAnswer={saveAnswer}
           setIsRecording={setIsRecording}
-          role={role}          // ✅ ADDED: Pass role to QuestionCard
-          level={level}        // ✅ ADDED: Pass level to QuestionCard
+          role={role}
+          level={level}
         />
       </div>
 
