@@ -112,10 +112,6 @@ const Interview = () => {
   const submitInterview = async () => {
     const finalAnswers = answers.filter(a => a && a.answer && a.answer.trim() !== '')
 
-    if (finalAnswers.length === 0) {
-      alert('Please answer at least one question before submitting')
-      return
-    }
 
     try {
       const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
