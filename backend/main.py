@@ -4,6 +4,9 @@ from routes.interview import router as interview_router
 from routes.deepgram_token import router as deepgram_router
 from routes.auth import router as auth_router
 from routes.admin import router as admin_router
+from database import init_db
+from contextlib import asynccontextmanager
+
 
 app = FastAPI()
 
@@ -17,9 +20,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    init_db()
+    print("✅ Database initialized")
+    
+    yield  # App runs here
+    
+    # Shutdown logic (optional)
+    print("🛑 App shutting down")
+
+app = FastAPI(lifespan=lifespan)
+
+
 @app.get("/")
 def root():
     return {"message": "AI Mock Interview Platform API v2.0"}
+
 
 app.include_router(interview_router)
 app.include_router(deepgram_router)

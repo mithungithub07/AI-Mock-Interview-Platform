@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
-from services.auth_service import get_admin_user, create_interview_token
-from services.email_service import send_interview_link
+from services.auth_services import get_admin_user, create_interview_token
+from services.emailservices import send_interview_link
 from services.pdf_loader import extract_questions_from_pdf, save_questions_to_json, load_questions
 from models.admin_model import SendInterviewLinkRequest, QuestionUpdate
 import os
