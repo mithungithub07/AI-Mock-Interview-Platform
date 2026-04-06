@@ -125,3 +125,57 @@ def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
     except FileNotFoundError:
         print(" questions.json not found")
         return []
+    
+
+
+def extract_questions_from_pdf(pdf_path: str) -> dict:
+    """
+    Extract questions from PDF and organize by level
+    Returns: {"fresher": [...], "junior": [...], "senior": [...], "architect": [...]}
+    """
+    # TODO: Implement your PDF extraction logic
+    # This is a placeholder - customize based on your PDF format
+    
+    questions = {
+        "fresher": [],
+        "junior": [],
+        "senior": [],
+        "architect": []
+    }
+    
+    # Example extraction (customize this)
+    with open(pdf_path, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+        
+        # Parse text and categorize questions
+        # This is where you'd implement your parsing logic
+        
+    return questions
+
+def save_questions_to_json(role: str, questions_by_level: dict):
+    """Save extracted questions to questions.json"""
+    
+    # Load existing questions
+    try:
+        with open("questions.json", "r") as f:
+            all_questions = json.load(f)
+    except FileNotFoundError:
+        all_questions = {}
+    
+    # Update questions for this role
+    all_questions[role] = questions_by_level
+    
+    # Save back
+    with open("questions.json", "w") as f:
+        json.dump(all_questions, f, indent=2)
+
+def load_questions() -> dict:
+    """Load all questions from questions.json"""
+    try:
+        with open("questions.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}    
