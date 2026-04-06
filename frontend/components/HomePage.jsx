@@ -11,10 +11,17 @@ const Home = () => {
     const [selectedRole, setSelectedRole] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("")
 
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.reload();
+    };
+
     useEffect(() => {
         sessionStorage.clear()
     }, [])
-
 
     const handleStart = async () => {
         if (!selectedRole || !selectedLevel) {
@@ -37,7 +44,28 @@ const Home = () => {
     }
 
     return (
-        <div>
+        <div className="homepage">
+            {/* ✅ NEW: Auth Header */}
+            <div className="auth-header">
+                {user ? (
+                    <div className="user-info">
+                        <span className="welcome-text">Welcome, {user.name}</span>
+                        <button className="btn-logout" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    </div>
+                ) : (
+                    <div className="auth-buttons">
+                        <button className="btn-login" onClick={() => navigate('/login')}>
+                            Login
+                        </button>
+                        <button className="btn-register" onClick={() => navigate('/register')}>
+                            Register
+                        </button>
+                    </div>
+                )}
+            </div>
+
             <section className="hero-section">
 
                 <div className="hero-content">
