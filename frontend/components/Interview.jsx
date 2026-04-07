@@ -7,109 +7,73 @@ const Interview = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  //Get role and level from state or sessionStorage
-  // const role = location.state?.role || sessionStorage.getItem("role")
-  // const level = location.state?.level || sessionStorage.getItem("level")
-  // 1️⃣ Initialize role & level
+  // ROLE & LEVEL from location.state (link) or sessionStorage (normal user)
   const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role"))
   const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level"))
 
-  // 2️⃣ Sync them to sessionStorage
-  useEffect(() => {
-    if (role) sessionStorage.setItem("role", role)
-    if (level) sessionStorage.setItem("level", level)
-  }, [role, level])
-
+  // Current question index
   const [currentQuestion, setCurrentQuestion] = useState(() => {
     return parseInt(sessionStorage.getItem("currentQuestion") || "0")
   })
 
+  // User answers
   const [answers, setAnswers] = useState(() => {
     const saved = sessionStorage.getItem("answers")
     return saved ? JSON.parse(saved) : []
   })
 
+  // Timer and recording
   const [isRecording, setIsRecording] = useState(false)
   const [timeLeft, setTimeLeft] = useState(() => {
     return parseInt(sessionStorage.getItem("timeLeft") || "60")
   })
 
+  // Questions state
   const [questions, setQuestions] = useState(() => {
     const saved = sessionStorage.getItem("questions")
     if (saved) return JSON.parse(saved)
-    return []
+    return Array.isArray(location.state?.questions) ? location.state.questions : []
   })
 
-  // Save session data
+  // ✅ Sync role & level to sessionStorage whenever they change
   useEffect(() => {
-    sessionStorage.setItem("role", role)
-    sessionStorage.setItem("level", level)
+    if (role) sessionStorage.setItem("role", role)
+    if (level) sessionStorage.setItem("level", level)
   }, [role, level])
 
-  useEffect(() => {
-    sessionStorage.setItem("currentQuestion", currentQuestion)
-  }, [currentQuestion])
-
-  useEffect(() => {
-    sessionStorage.setItem("answers", JSON.stringify(answers))
-  }, [answers])
-
-  useEffect(() => {
-    sessionStorage.setItem("timeLeft", timeLeft)
-  }, [timeLeft])
-
+  // ✅ Sync other states to sessionStorage
+  useEffect(() => { sessionStorage.setItem("currentQuestion", currentQuestion) }, [currentQuestion])
+  useEffect(() => { sessionStorage.setItem("answers", JSON.stringify(answers)) }, [answers])
+  useEffect(() => { sessionStorage.setItem("timeLeft", timeLeft) }, [timeLeft])
   useEffect(() => {
     if (questions.length > 0) {
       sessionStorage.setItem("questions", JSON.stringify(questions))
     }
   }, [questions])
 
-  // Fetch questions if empty using token from URL
+  // ✅ Fetch questions from backend if not present
   useEffect(() => {
-    const fetchQuestionsFromToken = async () => {
-      const params = new URLSearchParams(location.search)
-      const token = params.get("token")
-      if (!token) return
-
-      try {
-        const res = await fetch(
-          "https://ai-mock-interview-platform-pryk.onrender.com/admin/validate-interview-token",
-          { method: "POST", body: new URLSearchParams({ token }) }
-        )
-        const data = await res.json()
-        if (!data.valid) {
-          alert("Invalid or expired interview link")
-          return
-        }
-
-        // Set role and level from token data
-        sessionStorage.setItem("role", data.role)
-        sessionStorage.setItem("level", data.level)
-
-        setQuestions(data.questions || []) // if questions are included in token
-        // OR fetch questions separately
-        if (!data.questions) {
-          const questionsRes = await fetch(
-            "https://ai-mock-interview-platform-pryk.onrender.com/start-interview",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ role: data.role, level: data.level })
-            }
+    const fetchQuestions = async () => {
+      if (questions.length === 0 && role && level) {
+        try {
+          const res = await fetch(
+            `https://ai-mock-interview-platform-pryk.onrender.com/get-questions?role=${role}&level=${level}`
           )
-          const questionsData = await questionsRes.json()
-          setQuestions(questionsData.questions || [])
+          const data = await res.json()
+          if (data.questions && data.questions.length > 0) {
+            setQuestions(data.questions)
+          } else {
+            console.error("No questions received from backend")
+          }
+        } catch (err) {
+          console.error("Error fetching questions:", err)
         }
-
-      } catch (err) {
-        console.error("Error loading questions:", err)
       }
     }
+    fetchQuestions()
+  }, [questions, role, level])
 
-    if (questions.length === 0) fetchQuestionsFromToken()
-  }, [])
-
-  // Check if current question is coding
+  // ✅ Determine if current question is coding
   const isCodingQuestion = () => {
     if (!questions[currentQuestion]) return false
     const codingKeywords = [
@@ -119,14 +83,23 @@ const Interview = () => {
     ]
     const isJuniorOrSenior = level === 'junior' || level === 'senior'
     const questionLower = questions[currentQuestion].toLowerCase()
-    return isJuniorOrSenior && codingKeywords.some(keyword => questionLower.includes(keyword))
+    return isJuniorOrSenior && codingKeywords.some(k => questionLower.includes(k))
   }
 
-  // Timer per question
+  // ✅ Set timer when question changes
   useEffect(() => {
-    if (isCodingQuestion()) setTimeLeft(1200)
-    else setTimeLeft(60)
-  }, [currentQuestion])
+    setTimeLeft(isCodingQuestion() ? 1200 : 60)
+  }, [currentQuestion, questions])
+
+  // ✅ Timer countdown
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      if (currentQuestion < questions.length - 1) setCurrentQuestion(currentQuestion + 1)
+      else submitInterview()
+    }
+    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000)
+    return () => clearInterval(timer)
+  }, [timeLeft, currentQuestion])
 
   const saveAnswer = (answer) => {
     const updated = [...answers]
@@ -134,22 +107,12 @@ const Interview = () => {
     setAnswers(updated)
   }
 
-  // Timer countdown
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      if (currentQuestion < questions.length - 1) setCurrentQuestion(currentQuestion + 1)
-      else submitInterview()
-    }
-
-    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000)
-    return () => clearInterval(timer)
-  }, [timeLeft, currentQuestion])
-
   const nextQuestion = () => setCurrentQuestion(currentQuestion + 1)
 
+  // ✅ Submit interview
   const submitInterview = async () => {
-    const finalAnswers = answers.filter(a => a && a.answer && a.answer.trim() !== '')
-    console.log("Submitting interview:", { role, level, finalAnswers })
+    const finalAnswers = answers.filter(a => a?.answer?.trim())
+    console.log('Submitting Interview:', { role, level, finalAnswers })
 
     try {
       const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
@@ -160,25 +123,25 @@ const Interview = () => {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("Backend error:", errorText)
-        throw new Error("Failed to generate feedback")
+        console.error('Backend Error:', errorText)
+        throw new Error(`Backend Error: ${errorText}`)
       }
 
       const data = await response.json()
-      console.log("Feedback received:", data)
       sessionStorage.clear()
       navigate("/feedback", { state: { feedback: data.feedback } })
 
     } catch (error) {
-      console.error("Submit interview error:", error)
-      alert("Failed to submit interview. Please try again.")
+      console.error('Submit Error:', error)
+      alert('Failed to submit interview. Please try again.')
     }
   }
 
+  // ✅ Loading state if questions not yet available
   if (questions.length === 0) {
     return (
       <div className="interview-loading">
-        <h2>Generating Interview Questions</h2>
+        <h2>Generating Interview Questions...</h2>
         <div className="loading-dots"><span /><span /><span /></div>
       </div>
     )
@@ -186,6 +149,7 @@ const Interview = () => {
 
   const progress = Math.round(((currentQuestion + 1) / questions.length) * 100)
   const isLast = currentQuestion === questions.length - 1
+
   const formatTime = (seconds) => {
     if (isCodingQuestion()) {
       const mins = Math.floor(seconds / 60)
@@ -199,17 +163,20 @@ const Interview = () => {
     <div className="interview-page">
       <div className="interview-header">
         <p className="interview-role-label">AI Mock Interview</p>
-        <h1 className="interview-title">{role} Interview</h1>
-        <p className="interview-level">{level}</p>
+        <h1 className="interview-title">{role || "Unknown"} Interview</h1>
+        <p className="interview-level">{level || "Unknown"}</p>
       </div>
 
       <div className="interview-progress">
         <div className="progress-info">
           <span>Question {currentQuestion + 1} of {questions.length}</span>
           <span>{progress}%</span>
-          <span className={timeLeft <= 10 ? "timer-critical" : timeLeft <= 20 ? "timer-warning" : "timer-safe"}>
-            ⏱ {formatTime(timeLeft)}
-          </span>
+          <span
+            className={
+              timeLeft <= 10 ? "timer-critical" :
+                timeLeft <= 20 ? "timer-warning" : "timer-safe"
+            }
+          >⏱ {formatTime(timeLeft)}</span>
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${progress}%` }} />
@@ -231,13 +198,18 @@ const Interview = () => {
 
       <div className="interview-nav">
         <span className="nav-hint">
-          {isRecording ? "⏺ Stop recording before continuing" : isLast ? "Ready to submit?" : "Answer, then move on"}
+          {isRecording ? "⏺ Stop recording before continuing" :
+            isLast ? "Ready to submit?" : "Answer, then move on"}
         </span>
         <div className="nav-buttons">
           {!isLast ? (
-            <button className="btn-next" onClick={nextQuestion} disabled={isRecording}>Next Question</button>
+            <button className="btn-next" onClick={nextQuestion} disabled={isRecording}>
+              Next Question
+            </button>
           ) : (
-            <button className="btn-submit" onClick={submitInterview} disabled={isRecording}>Submit Interview</button>
+            <button className="btn-submit" onClick={submitInterview} disabled={isRecording}>
+              Submit Interview
+            </button>
           )}
         </div>
       </div>
