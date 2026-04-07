@@ -226,7 +226,6 @@ def send_interview_link(to_email: str, role: str, level: str, token: str):
 
         if response.status_code not in [200, 201]:
             raise Exception(response.text)
-
         print("✅ Email sent successfully")
         return True
 
