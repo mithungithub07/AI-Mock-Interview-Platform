@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import QuestionCard from "./QuestionCard"
 import "../style/interview.css"
 
@@ -7,9 +8,18 @@ const Interview = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // ROLE & LEVEL from location.state (link) or sessionStorage (normal user)
-  const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role"))
-  const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level"))
+  const query = new URLSearchParams(location.search)
+  const roleParam = query.get("role")
+  const levelParam = query.get("level")
+
+  const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role") || roleParam)
+  const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level") || levelParam)
+
+  // Save to sessionStorage whenever role/level changes
+  useEffect(() => {
+    if (role) sessionStorage.setItem("role", role)
+    if (level) sessionStorage.setItem("level", level)
+  }, [role, level])
 
   // Current question index
   const [currentQuestion, setCurrentQuestion] = useState(() => {
