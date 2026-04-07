@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
-from fastapi import BackgroundTasks
 from services.auth_services import get_admin_user, create_interview_token
 from services.emailservices import send_interview_link
 from services.pdf_loader import extract_questions_from_pdf, save_questions_to_json, load_questions
@@ -63,52 +62,30 @@ async def upload_pdf(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to extract questions: {str(e)}")
 
-
-
 @router.post("/send-interview-link")
 def send_link(
     request: SendInterviewLinkRequest,
-    background_tasks: BackgroundTasks,
     admin: dict = Depends(get_admin_user)
 ):
     """Send interview link via email (Admin only)"""
-
+    
+    # Create interview token
+    token = create_interview_token(request.role, request.level, request.email)
+    
+    # Send email
     try:
-        print("STEP 1: Request received")
-
-        # ✅ Create interview token
-        token = create_interview_token(
-            request.role,
-            request.level,
-            request.email
-        )
-        print("STEP 2: Token created")
-
-        # ✅ Send email in background (NON-BLOCKING)
-        background_tasks.add_task(
-            send_interview_link,
-            request.email,
-            request.role,
-            request.level,
-            token
-        )
-
-        print("STEP 3: Email task added")
-
-        # ✅ Immediate response (no waiting)
+        send_interview_link(request.email, request.role, request.level, token)
+        print("TOKEN GENERATED:", token)
+        
         return {
-            "message": "Interview link is being sent",
+            "message": "Interview link sent successfully",
             "email": request.email,
             "role": request.role,
             "level": request.level
         }
-
+    
     except Exception as e:
-        print("❌ ERROR in send_link:", str(e))  # 👈 important for Render logs
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to process request: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/questions")
 def get_all_questions(admin: dict = Depends(get_admin_user)):
