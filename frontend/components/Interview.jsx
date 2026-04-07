@@ -8,8 +8,10 @@ const Interview = () => {
   const navigate = useNavigate()
 
   // Get role and level from state or sessionStorage
-  const role = location.state?.role || sessionStorage.getItem("role")
-  const level = location.state?.level || sessionStorage.getItem("level")
+  // const role = location.state?.role || sessionStorage.getItem("role")
+  // const level = location.state?.level || sessionStorage.getItem("level")
+  const [role, setRole] = useState(() => sessionStorage.getItem("role"))
+  const [level, setLevel] = useState(() => sessionStorage.getItem("level"))
 
   const [currentQuestion, setCurrentQuestion] = useState(() => {
     return parseInt(sessionStorage.getItem("currentQuestion") || "0")
@@ -63,36 +65,41 @@ const Interview = () => {
       if (!token) return
 
       try {
-        // Validate token
-        const res = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/admin/validate-interview-token", {
-          method: "POST",
-          body: new URLSearchParams({ token })
-        })
+        const res = await fetch(
+          "https://ai-mock-interview-platform-pryk.onrender.com/admin/validate-interview-token",
+          { method: "POST", body: new URLSearchParams({ token }) }
+        )
         const data = await res.json()
         if (!data.valid) {
           alert("Invalid or expired interview link")
           return
         }
 
-        // Fetch questions
-        const questionsRes = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/start-interview", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: data.role, level: data.level })
-        })
+        // Set role and level from token data
+        sessionStorage.setItem("role", data.role)
+        sessionStorage.setItem("level", data.level)
 
-        const questionsData = await questionsRes.json()
-        console.log("Questions loaded:", questionsData)
-        setQuestions(questionsData.questions || [])
+        setQuestions(data.questions || []) // if questions are included in token
+        // OR fetch questions separately
+        if (!data.questions) {
+          const questionsRes = await fetch(
+            "https://ai-mock-interview-platform-pryk.onrender.com/start-interview",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ role: data.role, level: data.level })
+            }
+          )
+          const questionsData = await questionsRes.json()
+          setQuestions(questionsData.questions || [])
+        }
 
       } catch (err) {
         console.error("Error loading questions:", err)
       }
     }
 
-    if (questions.length === 0) {
-      fetchQuestionsFromToken()
-    }
+    if (questions.length === 0) fetchQuestionsFromToken()
   }, [])
 
   // Check if current question is coding
