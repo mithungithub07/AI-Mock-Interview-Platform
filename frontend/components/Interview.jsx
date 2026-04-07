@@ -7,11 +7,11 @@ const Interview = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Get role and level from state or sessionStorage
+  //Get role and level from state or sessionStorage
   // const role = location.state?.role || sessionStorage.getItem("role")
   // const level = location.state?.level || sessionStorage.getItem("level")
-  const [role, setRole] = useState(() => sessionStorage.getItem("role"))
-  const [level, setLevel] = useState(() => sessionStorage.getItem("level"))
+  const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role"))
+  const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level"))
 
   const [currentQuestion, setCurrentQuestion] = useState(() => {
     return parseInt(sessionStorage.getItem("currentQuestion") || "0")
