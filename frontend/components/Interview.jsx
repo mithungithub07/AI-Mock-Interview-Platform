@@ -10,8 +10,15 @@ const Interview = () => {
   //Get role and level from state or sessionStorage
   // const role = location.state?.role || sessionStorage.getItem("role")
   // const level = location.state?.level || sessionStorage.getItem("level")
+  // 1️⃣ Initialize role & level
   const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role"))
   const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level"))
+
+  // 2️⃣ Sync them to sessionStorage
+  useEffect(() => {
+    if (role) sessionStorage.setItem("role", role)
+    if (level) sessionStorage.setItem("level", level)
+  }, [role, level])
 
   const [currentQuestion, setCurrentQuestion] = useState(() => {
     return parseInt(sessionStorage.getItem("currentQuestion") || "0")
