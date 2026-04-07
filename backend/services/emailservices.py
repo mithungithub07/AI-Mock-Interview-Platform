@@ -77,80 +77,157 @@
 
 #==============
 
+# import os
+# from dotenv import load_dotenv
+# import resend
+
+# load_dotenv()
+
+# # ✅ Load API key from environment
+# resend.api_key = os.getenv("RESEND_API_KEY")
+
+# # ✅ Your frontend URL
+# FRONTEND_URL = "https://ai-mock-interview-platform-mu.vercel.app"
+
+
+# def send_interview_link(to_email: str, role: str, level: str, token: str):
+#     """Send interview link email using Resend API"""
+
+#     print("📧 Sending email to:", to_email)
+
+#     # ✅ Validate API key
+#     if not resend.api_key:
+#         raise Exception("RESEND_API_KEY not configured")
+
+#     # ✅ Create interview link
+#     interview_url = f"{FRONTEND_URL}/interview?role={role}&level={level}&token={token}"
+
+#     # ✅ Email subject
+#     subject = "Your Mock Interview is Ready! 🎯"
+
+#     # ✅ HTML email (your styled version)
+#     html_body = f"""
+#     <html>
+#         <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+#             <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px;">
+#                 <h2 style="color: #667eea;">Your Mock Interview is Ready!</h2>
+#                 <p>Hello,</p>
+#                 <p>You have been invited to take a <strong>{role}</strong> mock interview at <strong>{level}</strong> level.</p>
+
+#                 <div style="margin: 30px 0; text-align: center;">
+#                     <a href="{interview_url}" 
+#                        style="background: #667eea;
+#                               color: white; 
+#                               padding: 15px 40px; 
+#                               text-decoration: none; 
+#                               border-radius: 8px;
+#                               display: inline-block;">
+#                         Start Interview
+#                     </a>
+#                 </div>
+
+#                 <p style="color: #666; font-size: 14px;">
+#                     ⏰ This link will expire in 7 days.<br>
+#                     📝 The interview contains 15 questions<br>
+#                     🎤 You can answer via voice or code editor
+#                 </p>
+
+#                 <p style="color: #999; font-size: 12px; margin-top: 30px;">
+#                     If the button doesn't work, copy this link:<br>
+#                     <a href="{interview_url}">{interview_url}</a>
+#                 </p>
+#             </div>
+#         </body>
+#     </html>
+#     """
+
+#     try:
+#         # ✅ Send email via Resend
+#         response = resend.Emails.send({
+#             "from": "onboarding@resend.dev",  # default sender (works immediately)
+#             "to": to_email,
+#             "subject": subject,
+#             "html": html_body
+#         })
+
+#         print("✅ Email sent successfully:", response)
+#         return True
+
+#     except Exception as e:
+#         print("❌ Email send failed:", str(e))
+#         raise Exception(f"Failed to send email: {str(e)}")
+    
+
+
+#=============================================
+
 import os
+import requests
 from dotenv import load_dotenv
-import resend
 
 load_dotenv()
 
-# ✅ Load API key from environment
-resend.api_key = os.getenv("RESEND_API_KEY")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
-# ✅ Your frontend URL
 FRONTEND_URL = "https://ai-mock-interview-platform-mu.vercel.app"
 
 
 def send_interview_link(to_email: str, role: str, level: str, token: str):
-    """Send interview link email using Resend API"""
+    """Send interview link using Brevo API"""
 
     print("📧 Sending email to:", to_email)
 
-    # ✅ Validate API key
-    if not resend.api_key:
-        raise Exception("RESEND_API_KEY not configured")
+    if not BREVO_API_KEY:
+        raise Exception("BREVO_API_KEY not configured")
 
-    # ✅ Create interview link
     interview_url = f"{FRONTEND_URL}/interview?role={role}&level={level}&token={token}"
 
-    # ✅ Email subject
-    subject = "Your Mock Interview is Ready! 🎯"
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    # ✅ HTML email (your styled version)
-    html_body = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px;">
-                <h2 style="color: #667eea;">Your Mock Interview is Ready!</h2>
-                <p>Hello,</p>
-                <p>You have been invited to take a <strong>{role}</strong> mock interview at <strong>{level}</strong> level.</p>
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json"
+    }
 
-                <div style="margin: 30px 0; text-align: center;">
-                    <a href="{interview_url}" 
-                       style="background: #667eea;
-                              color: white; 
-                              padding: 15px 40px; 
-                              text-decoration: none; 
-                              border-radius: 8px;
-                              display: inline-block;">
-                        Start Interview
-                    </a>
-                </div>
+    payload = {
+        "sender": {
+            "name": "AI Mock Interview",
+            "email": "mithun.kumar.careers@gmail.com"   # use YOUR VERIFIED email in Brevo
+        },
+        "to": [
+            {
+                "email": to_email
+            }
+        ],
+        "subject": "Your Mock Interview is Ready! 🎯",
+        "htmlContent": f"""
+        <html>
+            <body style="font-family: Arial; padding:20px;">
+                <h2>Your Mock Interview is Ready!</h2>
+                <p>Role: <b>{role}</b></p>
+                <p>Level: <b>{level}</b></p>
 
-                <p style="color: #666; font-size: 14px;">
-                    ⏰ This link will expire in 7 days.<br>
-                    📝 The interview contains 15 questions<br>
-                    🎤 You can answer via voice or code editor
-                </p>
+                <a href="{interview_url}" 
+                   style="background:#667eea;color:white;padding:10px 20px;text-decoration:none;">
+                   Start Interview
+                </a>
 
-                <p style="color: #999; font-size: 12px; margin-top: 30px;">
-                    If the button doesn't work, copy this link:<br>
-                    <a href="{interview_url}">{interview_url}</a>
-                </p>
-            </div>
-        </body>
-    </html>
-    """
+                <p>Link: {interview_url}</p>
+            </body>
+        </html>
+        """
+    }
 
     try:
-        # ✅ Send email via Resend
-        response = resend.Emails.send({
-            "from": "onboarding@resend.dev",  # default sender (works immediately)
-            "to": to_email,
-            "subject": subject,
-            "html": html_body
-        })
+        response = requests.post(url, json=payload, headers=headers)
 
-        print("✅ Email sent successfully:", response)
+        print("Brevo response:", response.text)
+
+        if response.status_code not in [200, 201]:
+            raise Exception(response.text)
+
+        print("✅ Email sent successfully")
         return True
 
     except Exception as e:
