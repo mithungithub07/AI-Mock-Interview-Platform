@@ -60,7 +60,11 @@ const AdminDashboard = () => {
         setLinkMessage('');
 
         try {
-            const data = await sendInterviewLink(candidateEmail, linkRole, linkLevel);
+            const data = await sendInterviewLink({
+                email: candidateEmail,
+                role: linkRole,
+                level: linkLevel
+            });
             setLinkMessage(`✅ Interview link sent to ${candidateEmail}`);
             setCandidateEmail('');
         } catch (err) {
