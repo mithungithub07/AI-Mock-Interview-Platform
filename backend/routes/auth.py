@@ -34,6 +34,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
     
     # Generate token
     token = create_access_token(new_user.email, new_user.role)
+
     
     return {
         "access_token": token,

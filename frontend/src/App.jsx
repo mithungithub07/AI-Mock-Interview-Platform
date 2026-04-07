@@ -4,6 +4,7 @@ import Interview from "../components/Interview"
 import Feedback from "../components/Feedback"
 import Login from "../components/Login"
 import Register from "../components/Register"
+import Admin from "../components/AdminDashboard"
 
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
+
+        <Route path="/admin" element={<Admin />} />
 
       </Routes>
 

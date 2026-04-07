@@ -16,14 +16,15 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const data = await loginUser(email, password);
+            const data = await loginUser({
+                email,
+                password
+            });
 
             if (data.access_token) {
-                // Save token and user info
                 localStorage.setItem('token', data.access_token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                // Redirect based on role
                 if (data.user.role === 'admin') {
                     navigate('/admin');
                 } else {
@@ -38,6 +39,7 @@ const Login = () => {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="auth-container">

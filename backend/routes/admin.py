@@ -129,7 +129,7 @@ def update_questions(
 @router.post("/validate-interview-token")
 def validate_interview_token(token: str = Form(...)):
     """Validate interview link token (Public endpoint)"""
-    from services.auth_service import verify_token
+    from services.auth_services import verify_token
     
     try:
         payload = verify_token(token)

@@ -8,30 +8,32 @@ from database import init_db
 from contextlib import asynccontextmanager
 
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://ai-mock-interview-platform-mu.vercel.app",
-                   "http://localhost:5173"
-                   ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
     init_db()
     print("✅ Database initialized")
     
-    yield  # App runs here
+    yield
     
-    # Shutdown logic (optional)
     print("🛑 App shutting down")
 
+
+
 app = FastAPI(lifespan=lifespan)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://ai-mock-interview-platform-mu.vercel.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -43,10 +45,3 @@ app.include_router(interview_router)
 app.include_router(deepgram_router)
 app.include_router(auth_router)
 app.include_router(admin_router)
-
-
-
-
-
-
-
