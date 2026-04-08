@@ -44,6 +44,7 @@ const Register = () => {
                 setLoading(false);
             }
         } catch (err) {
+            console.error('Full error:', err);  // ← ADD THIS
             setError('Registration failed. Email may already be in use.');
             setLoading(false);
         }
