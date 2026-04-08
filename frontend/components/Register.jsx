@@ -31,7 +31,8 @@ const Register = () => {
         setLoading(true);
 
         try {
-            const data = await registerUser(name, email, password);
+            // const data = await registerUser(name, email, password);
+            const data = await registerUser({ name, email, password });
 
             if (data.access_token) {
                 // Save token and user info
