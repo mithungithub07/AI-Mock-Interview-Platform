@@ -37,14 +37,14 @@ const Register = () => {
             if (data.access_token) {
                 localStorage.setItem('token', data.access_token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-
                 navigate('/');
+
             } else {
                 setError(data.detail || 'Registration failed');
+                setLoading(false);
             }
         } catch (err) {
             setError('Registration failed. Email may already be in use.');
-        } finally {
             setLoading(false);
         }
     };
