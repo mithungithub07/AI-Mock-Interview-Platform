@@ -44,7 +44,7 @@ const Interview = () => {
           formData.append('token', token)
 
           const res = await fetch(
-            'http://127.0.0.1:8000/admin/validate-interview-token',
+            'https://ai-mock-interview-platform-pryk.onrender.com/admin/validate-interview-token',
             {
               method: 'POST',
               body: formData
