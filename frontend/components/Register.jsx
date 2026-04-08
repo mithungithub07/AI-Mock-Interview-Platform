@@ -35,11 +35,9 @@ const Register = () => {
             const data = await registerUser({ name, email, password });
 
             if (data.access_token) {
-                // Save token and user info
                 localStorage.setItem('token', data.access_token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                // Redirect to homepage
                 navigate('/');
             } else {
                 setError(data.detail || 'Registration failed');
