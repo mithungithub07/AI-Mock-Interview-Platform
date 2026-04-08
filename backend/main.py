@@ -4,7 +4,8 @@ from routes.interview import router as interview_router
 from routes.deepgram_token import router as deepgram_router
 from routes.auth import router as auth_router
 from routes.admin import router as admin_router
-from database import init_db
+from database import init_db, SessionLocal
+from sqlalchemy import text
 from contextlib import asynccontextmanager
 
 
@@ -17,7 +18,6 @@ async def lifespan(app: FastAPI):
     yield
     
     print("🛑 App shutting down")
-
 
 
 app = FastAPI(lifespan=lifespan)
@@ -39,6 +39,27 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "AI Mock Interview Platform API v2.0"}
+
+
+# 🔧 Database Health Check Endpoint
+@app.get("/api/health/db")
+def check_db_health():
+    """Test database connection"""
+    try:
+        db = SessionLocal()
+        result = db.execute(text("SELECT 1"))
+        db.close()
+        return {
+            "status": "success",
+            "message": "✅ Connected to Supabase PostgreSQL",
+            "database": "supabase"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"❌ Database connection failed: {str(e)}",
+            "error_type": type(e).__name__
+        }
 
 
 app.include_router(interview_router)
