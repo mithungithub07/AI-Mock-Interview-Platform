@@ -1,7 +1,7 @@
 import axios from "axios";
-
+//baseURL: "https://ai-mock-interview-platform-pryk.onrender.com"
 const API = axios.create({
-  baseURL: "https://ai-mock-interview-platform-pryk.onrender.com",
+  baseURL: "http://127.0.0.1:8000",
 });
 
 // ✅ AUTO ATTACH TOKEN TO EVERY REQUEST
