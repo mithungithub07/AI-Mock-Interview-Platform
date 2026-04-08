@@ -7,82 +7,134 @@ const Interview = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const query = new URLSearchParams(location.search)
-  const roleParam = query.get("role")
-  const levelParam = query.get("level")
-
-  const [role, setRole] = useState(() => location.state?.role || sessionStorage.getItem("role") || roleParam)
-  const [level, setLevel] = useState(() => location.state?.level || sessionStorage.getItem("level") || levelParam)
-
-  // Save to sessionStorage whenever role/level changes
-  useEffect(() => {
-    if (role) sessionStorage.setItem("role", role)
-    if (level) sessionStorage.setItem("level", level)
-  }, [role, level])
-
-  // Current question index
-  const [currentQuestion, setCurrentQuestion] = useState(() => {
-    return parseInt(sessionStorage.getItem("currentQuestion") || "0")
-  })
-
-  // User answers
+  const [role, setRole] = useState(() =>
+    location.state?.role || sessionStorage.getItem("role") || ""
+  )
+  const [level, setLevel] = useState(() =>
+    location.state?.level || sessionStorage.getItem("level") || ""
+  )
+  const [currentQuestion, setCurrentQuestion] = useState(() =>
+    parseInt(sessionStorage.getItem("currentQuestion") || "0")
+  )
   const [answers, setAnswers] = useState(() => {
     const saved = sessionStorage.getItem("answers")
     return saved ? JSON.parse(saved) : []
   })
-
-  // Timer and recording
   const [isRecording, setIsRecording] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(() => {
-    return parseInt(sessionStorage.getItem("timeLeft") || "60")
-  })
-
-  // Questions state
+  const [timeLeft, setTimeLeft] = useState(() =>
+    parseInt(sessionStorage.getItem("timeLeft") || "60")
+  )
   const [questions, setQuestions] = useState(() => {
     const saved = sessionStorage.getItem("questions")
     if (saved) return JSON.parse(saved)
     return Array.isArray(location.state?.questions) ? location.state.questions : []
   })
 
-  // ✅ Sync role & level to sessionStorage whenever they change
+  // ✅ NEW: Validate interview token if present
   useEffect(() => {
-    if (role) sessionStorage.setItem("role", role)
-    if (level) sessionStorage.setItem("level", level)
-  }, [role, level])
+    const validateToken = async () => {
+      const query = new URLSearchParams(location.search)
+      const token = query.get('token')
+      const urlRole = query.get('role')
+      const urlLevel = query.get('level')
 
-  // ✅ Sync other states to sessionStorage
+      if (token) {
+        try {
+          const formData = new FormData()
+          formData.append('token', token)
+
+          const res = await fetch(
+            'https://ai-mock-interview-platform-pryk.onrender.com/admin/validate-interview-token',
+            {
+              method: 'POST',
+              body: formData
+            }
+          )
+
+          if (!res.ok) {
+            alert('Invalid or expired interview link')
+            navigate('/')
+            return
+          }
+
+          const data = await res.json()
+
+          if (data.valid) {
+            setRole(data.role)
+            setLevel(data.level)
+            sessionStorage.setItem('role', data.role)
+            sessionStorage.setItem('level', data.level)
+            console.log('✅ Token validated:', data)
+          } else {
+            alert('Invalid interview link')
+            navigate('/')
+          }
+        } catch (err) {
+          console.error('Token validation error:', err)
+          alert('Failed to validate interview link')
+          navigate('/')
+        }
+      } else if (urlRole && urlLevel) {
+        setRole(urlRole)
+        setLevel(urlLevel)
+      }
+    }
+
+    validateToken()
+  }, [location.search, navigate])
+
+  // Sync states to sessionStorage
+  useEffect(() => { if (role) sessionStorage.setItem("role", role) }, [role])
+  useEffect(() => { if (level) sessionStorage.setItem("level", level) }, [level])
   useEffect(() => { sessionStorage.setItem("currentQuestion", currentQuestion) }, [currentQuestion])
   useEffect(() => { sessionStorage.setItem("answers", JSON.stringify(answers)) }, [answers])
   useEffect(() => { sessionStorage.setItem("timeLeft", timeLeft) }, [timeLeft])
   useEffect(() => {
-    if (questions.length > 0) {
-      sessionStorage.setItem("questions", JSON.stringify(questions))
-    }
+    if (questions.length > 0) sessionStorage.setItem("questions", JSON.stringify(questions))
   }, [questions])
 
-  // ✅ Fetch questions from backend if not present
+  // ✅ FIXED: Fetch questions from backend
   useEffect(() => {
     const fetchQuestions = async () => {
       if (questions.length === 0 && role && level) {
         try {
+          console.log('📝 Fetching questions for:', role, level)
+
           const res = await fetch(
-            `https://ai-mock-interview-platform-pryk.onrender.com/get-questions?role=${role}&level=${level}`
+            'https://ai-mock-interview-platform-pryk.onrender.com/start-interview',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ role, level })
+            }
           )
+
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`)
+          }
+
           const data = await res.json()
+          console.log('✅ Questions received:', data.questions.length)
+
           if (data.questions && data.questions.length > 0) {
             setQuestions(data.questions)
+            sessionStorage.setItem('questions', JSON.stringify(data.questions))
           } else {
-            console.error("No questions received from backend")
+            console.error('❌ No questions in response')
+            alert('Failed to load questions. Please try again.')
+            navigate('/')
           }
         } catch (err) {
-          console.error("Error fetching questions:", err)
+          console.error('❌ Error fetching questions:', err)
+          alert('Failed to load questions. Please check your connection.')
+          navigate('/')
         }
       }
     }
     fetchQuestions()
-  }, [questions, role, level])
+  }, [questions.length, role, level, navigate])
 
-  // ✅ Determine if current question is coding
+  // Determine if current question is coding
   const isCodingQuestion = () => {
     if (!questions[currentQuestion]) return false
     const codingKeywords = [
@@ -95,12 +147,12 @@ const Interview = () => {
     return isJuniorOrSenior && codingKeywords.some(k => questionLower.includes(k))
   }
 
-  // ✅ Set timer when question changes
+  // Set timer when question changes
   useEffect(() => {
     setTimeLeft(isCodingQuestion() ? 1200 : 60)
-  }, [currentQuestion, questions])
+  }, [currentQuestion, questions, level])
 
-  // ✅ Timer countdown
+  // Timer countdown
   useEffect(() => {
     if (timeLeft <= 0) {
       if (currentQuestion < questions.length - 1) setCurrentQuestion(currentQuestion + 1)
@@ -118,17 +170,18 @@ const Interview = () => {
 
   const nextQuestion = () => setCurrentQuestion(currentQuestion + 1)
 
-  // ✅ Submit interview
   const submitInterview = async () => {
     const finalAnswers = answers.filter(a => a?.answer?.trim())
-    console.log('Submitting Interview:', { role, level, finalAnswers })
 
     try {
-      const response = await fetch("https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, level, interview_data: finalAnswers })
-      })
+      const response = await fetch(
+        "https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role, level, interview_data: finalAnswers })
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -146,11 +199,10 @@ const Interview = () => {
     }
   }
 
-  // ✅ Loading state if questions not yet available
   if (questions.length === 0) {
     return (
       <div className="interview-loading">
-        <h2>Generating Interview Questions...</h2>
+        <h2>Loading Interview Questions...</h2>
         <div className="loading-dots"><span /><span /><span /></div>
       </div>
     )
