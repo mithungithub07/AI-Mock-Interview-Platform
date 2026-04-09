@@ -30,7 +30,7 @@ const Interview = () => {
     return Array.isArray(location.state?.questions) ? location.state.questions : []
   })
 
-  // ✅ NEW: Validate interview token if present
+
   useEffect(() => {
     const validateToken = async () => {
       const query = new URLSearchParams(location.search)
@@ -93,7 +93,7 @@ const Interview = () => {
     if (questions.length > 0) sessionStorage.setItem("questions", JSON.stringify(questions))
   }, [questions])
 
-  // ✅ FIXED: Fetch questions from backend
+
   useEffect(() => {
     const fetchQuestions = async () => {
       if (questions.length === 0 && role && level) {
@@ -134,7 +134,7 @@ const Interview = () => {
     fetchQuestions()
   }, [questions.length, role, level, navigate])
 
-  // Determine if current question is coding
+
   const isCodingQuestion = () => {
     if (!questions[currentQuestion]) return false
     const codingKeywords = [
@@ -147,12 +147,12 @@ const Interview = () => {
     return isJuniorOrSenior && codingKeywords.some(k => questionLower.includes(k))
   }
 
-  // Set timer when question changes
+
   useEffect(() => {
     setTimeLeft(isCodingQuestion() ? 1200 : 60)
   }, [currentQuestion, questions, level])
 
-  // Timer countdown
+
   useEffect(() => {
     if (timeLeft <= 0) {
       if (currentQuestion < questions.length - 1) setCurrentQuestion(currentQuestion + 1)
