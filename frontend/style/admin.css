@@ -1,6 +1,6 @@
 .admin-container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #0d0d1a;
   padding: 20px;
 }
 
@@ -8,21 +8,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: #13131f;
   padding: 20px 40px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(102, 126, 234, 0.15);
   margin-bottom: 30px;
 }
 
 .admin-header h1 {
-  color: #333;
+  color: #ffffff;
   margin: 0 0 5px 0;
   font-size: 32px;
 }
 
 .admin-welcome {
-  color: #666;
+  color: #8b8fa8;
   font-size: 14px;
   margin: 0;
 }
@@ -50,15 +51,16 @@
 }
 
 .admin-section {
-  background: white;
+  background: #13131f;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
 .admin-section h2 {
   margin-bottom: 24px;
-  color: #333;
+  color: #ffffff;
   font-size: 24px;
   display: flex;
   align-items: center;
@@ -78,7 +80,7 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #555;
+  color: #a0a4bb;
   font-weight: 600;
   font-size: 14px;
 }
@@ -87,23 +89,35 @@
 .form-group input {
   width: 100%;
   padding: 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(102, 126, 234, 0.2);
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.3s;
   box-sizing: border-box;
+  background: #1a1a2e;
+  color: #e0e0f0;
+}
+
+.form-group select option {
+  background: #1a1a2e;
+  color: #e0e0f0;
 }
 
 .form-group select:focus,
 .form-group input:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.form-group input::placeholder {
+  color: #4a4e6a;
 }
 
 .form-group input[type="file"] {
   padding: 8px;
   cursor: pointer;
+  color: #a0a4bb;
 }
 
 .form-group input[type="file"]::file-selector-button {
@@ -137,18 +151,19 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
 }
 
 button[type="submit"]:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
 .success-message {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(39, 174, 96, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(39, 174, 96, 0.3);
   padding: 12px;
   border-radius: 6px;
   margin-top: 15px;
@@ -157,8 +172,9 @@ button[type="submit"]:disabled {
 }
 
 .error-message {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
   padding: 12px;
   border-radius: 6px;
   margin-top: 15px;
@@ -171,7 +187,7 @@ button[type="submit"]:disabled {
   .admin-content {
     grid-template-columns: 1fr;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }

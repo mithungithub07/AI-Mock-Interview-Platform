@@ -3,23 +3,41 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0d0d1a;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial glow matching homepage purple accent */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .auth-card {
-  background: white;
+  background: #13131f;
   padding: 40px;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(102, 126, 234, 0.2);
   width: 100%;
   max-width: 420px;
+  position: relative;
+  z-index: 1;
 }
 
 .auth-card h2 {
   margin-bottom: 30px;
   text-align: center;
-  color: #333;
+  color: #ffffff;
   font-size: 28px;
 }
 
@@ -30,7 +48,7 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #555;
+  color: #a0a4bb;
   font-weight: 600;
   font-size: 14px;
 }
@@ -38,17 +56,23 @@
 .form-group input {
   width: 100%;
   padding: 14px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.3s;
   box-sizing: border-box;
+  background: #1a1a2e;
+  color: #e0e0f0;
+}
+
+.form-group input::placeholder {
+  color: #4a4e6a;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 button[type="submit"] {
@@ -67,18 +91,19 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.5);
 }
 
 button[type="submit"]:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
 .error-message {
-  background: #fee;
-  color: #c33;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -89,7 +114,7 @@ button[type="submit"]:disabled {
 .auth-link {
   text-align: center;
   margin-top: 24px;
-  color: #666;
+  color: #6b6f88;
   font-size: 14px;
 }
 
@@ -101,13 +126,15 @@ button[type="submit"]:disabled {
 
 .auth-link a:hover {
   text-decoration: underline;
+  color: #8fa0f0;
 }
 
 .admin-hint {
   text-align: center;
   margin-top: 20px;
   padding: 12px;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.15);
   border-radius: 8px;
 }
 
