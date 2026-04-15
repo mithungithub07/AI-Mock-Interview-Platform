@@ -5,7 +5,7 @@ def interview_feedback_prompt(role: str, level: str, interview_data) -> str:
 
     formatted_responses = "\n".join(
         [
-            f"Q{i+1}: {item['question']}\nAnswer: {item['answer']}\n"
+            f"{item['question']}\nAnswer: {item['answer']}\n"
             for i, item in enumerate(interview_data)
         ]
     )
