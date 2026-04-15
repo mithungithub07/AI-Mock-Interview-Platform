@@ -74,4 +74,6 @@ Rules:
 - questions array must contain exactly {QUESTION_COUNT} items.
 - correctness is ONLY "Correct" or "Incorrect".
 - For coding questions, be lenient if approach is correct even if syntax has minor issues.
+
+CRITICAL: Do NOT wrap output in markdown code fences. Return raw JSON only.
 """
