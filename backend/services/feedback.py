@@ -14,8 +14,6 @@ def generate_feedback_ai(role, level, interview_data):
             if not item["answer"] or len(item["answer"].strip()) < 5:
                 item["answer"] = "No answer provided"
         
-        print("INTERVIEW_DATA:", interview_data[:2])  # Debug first 2 items
-        
         prompt = interview_feedback_prompt(role, level, interview_data)
 
         response = client.chat.completions.create(
@@ -25,12 +23,22 @@ def generate_feedback_ai(role, level, interview_data):
         )
         
         feedback = response.choices[0].message.content
-        print("AI RAW RESPONSE:", feedback[:500])  # Debug first 500 chars
         
+        # ✅ STRIP MARKDOWN CODE FENCES
+        feedback = feedback.strip()
+        if feedback.startswith("```json"):
+            feedback = feedback[7:]  # Remove ```json
+        elif feedback.startswith("```"):
+            feedback = feedback[3:]   # Remove ```
+        if feedback.endswith("```"):
+            feedback = feedback[:-3]  # Remove trailing ```
+        feedback = feedback.strip()
+        
+        print("CLEANED FEEDBACK:", feedback[:200])
         return feedback
 
     except Exception as e:
         print("FEEDBACK ERROR:", str(e))
         import traceback
-        traceback.print_exc()  # Full error trace
+        traceback.print_exc()
         return {"error": f"Failed to generate feedback: {str(e)}"}

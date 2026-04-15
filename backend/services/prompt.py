@@ -9,7 +9,7 @@ Level: {level}
 Total Questions: {QUESTION_COUNT}
 
 Candidate Responses:
-{interview_data}
+{'\n'.join([f"Q{i+1}: {item['question']}\nAnswer: {item['answer']}\n" for i, item in enumerate(interview_data)])}
 
 IMPORTANT: This interview contains BOTH theory questions and coding questions.
 
