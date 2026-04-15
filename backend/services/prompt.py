@@ -1,6 +1,15 @@
 QUESTION_COUNT = 15  
 
+
 def interview_feedback_prompt(role: str, level: str, interview_data) -> str:
+
+    formatted_responses = "\n".join(
+        [
+            f"Q{i+1}: {item['question']}\nAnswer: {item['answer']}\n"
+            for i, item in enumerate(interview_data)
+        ]
+    )
+
     return f"""
 You are a senior technical interviewer evaluating a mock interview.
 
@@ -9,7 +18,7 @@ Level: {level}
 Total Questions: {QUESTION_COUNT}
 
 Candidate Responses:
-{'\n'.join([f"Q{i+1}: {item['question']}\nAnswer: {item['answer']}\n" for i, item in enumerate(interview_data)])}
+{formatted_responses}
 
 IMPORTANT: This interview contains BOTH theory questions and coding questions.
 
