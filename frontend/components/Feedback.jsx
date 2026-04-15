@@ -15,6 +15,7 @@ const correctnessTag = (correctness) => {
         "Incorrect": "tag-incorrect",
     }
     return map[correctness] || "tag-incorrect"
+    console.log("RAW FEEDBACK:", raw)
 }
 
 const Feedback = () => {

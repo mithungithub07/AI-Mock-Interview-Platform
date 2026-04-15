@@ -22,7 +22,7 @@ def generate_feedback_ai(role, level, interview_data):
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
-
+        print("AI RESPONSE:", feedback)
         feedback = response.choices[0].message.content
         return feedback
 
