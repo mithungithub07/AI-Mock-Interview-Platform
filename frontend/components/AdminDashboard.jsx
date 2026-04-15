@@ -25,6 +25,21 @@ const AdminDashboard = () => {
         navigate('/login');
     };
 
+    const handlePdfFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                setUploadMessage('❌ Please select a valid PDF file');
+                setPdfFile(null);
+                e.target.value = ''; // Clear the input
+                return;
+            }
+            setPdfFile(file);
+            setUploadMessage(''); // Clear any previous messages
+        }
+    };
+
     const handleUploadPDF = async (e) => {
         e.preventDefault();
 
@@ -107,12 +122,18 @@ const AdminDashboard = () => {
                             <label>Upload PDF</label>
                             <input
                                 type="file"
-                                accept=".pdf"
-                                onChange={(e) => setPdfFile(e.target.files[0])}
+                                accept=".pdf,application/pdf"
+                                onChange={handlePdfFileChange}
+                                disabled={uploadLoading}
                             />
+                            {pdfFile && (
+                                <p style={{ marginTop: '8px', color: '#4ade80', fontSize: '14px' }}>
+                                    ✓ Selected: {pdfFile.name}
+                                </p>
+                            )}
                         </div>
 
-                        <button type="submit" disabled={uploadLoading}>
+                        <button type="submit" disabled={uploadLoading || !pdfFile}>
                             {uploadLoading ? 'Uploading...' : 'Upload & Extract Questions'}
                         </button>
                     </form>
