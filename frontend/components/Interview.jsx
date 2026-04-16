@@ -171,8 +171,10 @@ const Interview = () => {
   const nextQuestion = () => setCurrentQuestion(currentQuestion + 1)
 
   const submitInterview = async () => {
-    const finalAnswers = answers.filter(a => a?.answer?.trim())
-
+    const finalAnswers = questions.map((q, i) => ({
+      question: q,
+      answer: answers[i]?.answer || ""
+    }))
     try {
       const response = await fetch(
         "https://ai-mock-interview-platform-pryk.onrender.com/generate-feedback",
