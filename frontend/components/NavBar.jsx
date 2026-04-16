@@ -1,56 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import "../style/navbar.css"
+import './Navbar.css';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('isAdmin') === 'true');
+    const [isAdmin, setIsAdmin] = useState(false);
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-    const handleNavigation = (path) => {
-        navigate(path);
-    };
+    useEffect(() => {
+        const adminToken = localStorage.getItem('adminToken');
+        const adminUser = localStorage.getItem('isAdmin');
+        setIsAdmin(adminToken && adminUser === 'true');
+    }, [location]);
 
     const handleLogout = () => {
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('adminToken');
-        setIsAdmin(false);
-        navigate('/');
+        localStorage.clear();
+        window.location.reload();
     };
 
     return (
         <nav className="navbar">
             <div className="navbar-container">
                 {/* Logo/Brand */}
-                <div className="navbar-brand" onClick={() => handleNavigation('/')}>
+                <div className="navbar-brand" onClick={() => navigate('/')}>
                     <span className="brand-icon">🎯</span>
                     <span className="brand-text">Mock Interview</span>
                 </div>
 
                 {/* Navigation Links */}
                 <div className="navbar-links">
-                    {/* Home Button - Always visible */}
+                    {/* Home Button - Show on non-home pages */}
                     {location.pathname !== '/' && (
                         <button
                             className="nav-button nav-home"
-                            onClick={() => handleNavigation('/')}
+                            onClick={() => navigate('/')}
                         >
                             🏠 Home
                         </button>
                     )}
 
-                    {/* Admin Dashboard Button - Show if not on admin page */}
+                    {/* Admin Dashboard Button - Only show if admin logged in and not on admin page */}
                     {isAdmin && location.pathname !== '/admin' && (
                         <button
                             className="nav-button nav-admin"
-                            onClick={() => handleNavigation('/admin')}
+                            onClick={() => navigate('/admin')}
                         >
                             ⚙️ Admin Dashboard
                         </button>
                     )}
 
-                    {/* Logout Button - Only on Admin page */}
-                    {isAdmin && location.pathname === '/admin' && (
+                    {/* Logout Button - Show if user is logged in */}
+                    {user && (
                         <button
                             className="nav-button nav-logout"
                             onClick={handleLogout}

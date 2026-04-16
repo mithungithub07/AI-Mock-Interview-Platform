@@ -9,9 +9,6 @@ const HomePage = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("")
-    const [showAdminModal, setShowAdminModal] = useState(false)
-    const [adminPassword, setAdminPassword] = useState("")
-    const [error, setError] = useState("")
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -41,27 +38,6 @@ const HomePage = () => {
         } catch (err) {
             console.error("Error starting interview:", err)
             alert("Failed to start interview. See console for details.")
-        }
-    }
-
-    const handleAdminAccess = async () => {
-        setError("")
-        const ADMIN_PASSWORD = "your_secure_password_here"
-
-        if (adminPassword === ADMIN_PASSWORD) {
-            localStorage.setItem('isAdmin', 'true')
-            localStorage.setItem('adminToken', Date.now().toString())
-            navigate('/admin')
-            setShowAdminModal(false)
-            setAdminPassword("")
-        } else {
-            setError("Incorrect password")
-        }
-    }
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleAdminAccess()
         }
     }
 
@@ -129,70 +105,7 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Admin Access Button */}
-            <div className="admin-access-floating">
-                <button
-                    className="admin-access-btn"
-                    onClick={() => setShowAdminModal(true)}
-                    title="Admin dashboard access"
-                >
-                    ⚙️
-                </button>
-            </div>
 
-            {/* Admin Modal */}
-            {showAdminModal && (
-                <div className="modal-overlay" onClick={() => setShowAdminModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>Admin Access</h2>
-                            <button
-                                className="modal-close"
-                                onClick={() => {
-                                    setShowAdminModal(false)
-                                    setAdminPassword("")
-                                    setError("")
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="modal-body">
-                            <p>Enter admin password to access the dashboard:</p>
-                            <input
-                                type="password"
-                                placeholder="Enter admin password"
-                                value={adminPassword}
-                                onChange={(e) => setAdminPassword(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                className="modal-input"
-                                autoFocus
-                            />
-                            {error && <div className="error-message">{error}</div>}
-                        </div>
-
-                        <div className="modal-footer">
-                            <button
-                                className="btn-secondary"
-                                onClick={() => {
-                                    setShowAdminModal(false)
-                                    setAdminPassword("")
-                                    setError("")
-                                }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="btn-primary"
-                                onClick={handleAdminAccess}
-                            >
-                                Access Dashboard
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
 
 
