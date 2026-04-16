@@ -5,10 +5,11 @@ import { startInterview } from "../services/api"
 import heroImage from "../src/images/female.jpg"
 import "../style/homepage.css"
 
-const HomePage = () => {
+const Home = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("")
+
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -43,7 +44,7 @@ const HomePage = () => {
 
     return (
         <div className="homepage">
-            {/* Auth Header */}
+            {/* ✅ NEW: Auth Header */}
             <div className="auth-header">
                 {user ? (
                     <div className="user-info">
@@ -104,12 +105,12 @@ const HomePage = () => {
                     <img src={heroImage} alt="AI Interview" />
                 </div>
             </section>
-
-
         </div>
 
 
     )
 }
 
-export default HomePage
+export default Home
+
+
