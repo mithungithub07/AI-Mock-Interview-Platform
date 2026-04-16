@@ -97,7 +97,7 @@ const AdminDashboard = () => {
                     <p className="admin-welcome">Welcome, {user?.name}</p>
                 </div>
                 <div className="header-buttons">
-                    <button onClick={() => navigate('/')} className="home-btn">🏠 Home</button>
+                    <button onClick={() => navigate('/')} className="home-btn"> Home</button>
                     <button onClick={handleLogout} className="logout-btn">Logout</button>
                 </div>
             </div>
