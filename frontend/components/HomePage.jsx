@@ -5,11 +5,10 @@ import { startInterview } from "../services/api"
 import heroImage from "../src/images/female.jpg"
 import "../style/homepage.css"
 
-const Home = () => {
+const HomePage = () => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("")
-
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -44,14 +43,21 @@ const Home = () => {
 
     return (
         <div className="homepage">
-            {/* ✅ NEW: Auth Header */}
+            {/* Auth Header */}
             <div className="auth-header">
                 {user ? (
                     <div className="user-info">
                         <span className="welcome-text">Welcome, {user.name}</span>
-                        <button className="btn-logout" onClick={handleLogout}>
-                            Logout
-                        </button>
+                        <div className="header-actions">
+                            {user.role === 'admin' && (
+                                <button className="btn-admin" onClick={() => navigate('/admin')}>
+                                    ⚙️ Admin Dashboard
+                                </button>
+                            )}
+                            <button className="btn-logout" onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </div>
                     </div>
                 ) : (
                     <div className="auth-buttons">
@@ -111,6 +117,4 @@ const Home = () => {
     )
 }
 
-export default Home
-
-
+export default HomePage
