@@ -56,6 +56,7 @@ async def upload_pdf(
             "role": role,
             "filename": file.filename,
             "questions_extracted": total_questions,
+            "questions_by_level": questions_by_level,
             "breakdown": {level: len(q) for level, q in questions_by_level.items()}
         }
     
@@ -106,11 +107,12 @@ def update_questions(
         questions = load_questions()
         
         if update.role not in questions:
-            raise HTTPException(status_code=404, detail="Role not found")
+            questions[update.role] = {}
         
         if update.level not in questions[update.role]:
-            raise HTTPException(status_code=404, detail="Level not found")
+            questions[update.role][update.level] = []
         
+        # Append or replace questions
         questions[update.role][update.level] = update.questions
         
         # Save back to file
@@ -154,7 +156,7 @@ def validate_interview_token(token: str = Form(...)):
             "role": role,
             "level": level,
             "candidate_email": payload.get("candidate_email"),
-            "questions": questions  # ✅ ADDED THIS
+            "questions": questions
         }
     
     except HTTPException:

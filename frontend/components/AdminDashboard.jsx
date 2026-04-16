@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { uploadPDF, sendInterviewLink } from '../services/api';
+import { uploadPDF, sendInterviewLink, updateQuestions } from '../services/api';
 import '../style/admin.css';
 
 const AdminDashboard = () => {
@@ -9,9 +9,13 @@ const AdminDashboard = () => {
 
     // Upload PDF state
     const [selectedRole, setSelectedRole] = useState('java');
+    const [selectedLevel, setSelectedLevel] = useState('fresher');
     const [pdfFile, setPdfFile] = useState(null);
     const [uploadLoading, setUploadLoading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState('');
+    const [extractedQuestions, setExtractedQuestions] = useState([]);
+    const [showPreview, setShowPreview] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
     // Send link state
     const [linkRole, setLinkRole] = useState('java');
@@ -19,6 +23,20 @@ const AdminDashboard = () => {
     const [candidateEmail, setCandidateEmail] = useState('');
     const [linkLoading, setLinkLoading] = useState(false);
     const [linkMessage, setLinkMessage] = useState('');
+
+    const roles = [
+        { value: 'java', label: 'Java Developer' },
+        { value: 'python', label: 'Python Developer' },
+        { value: 'react', label: 'React Developer' },
+        { value: 'fullstack', label: 'Full Stack Developer' }
+    ];
+
+    const levels = [
+        { value: 'fresher', label: '🌱 Fresher (0–1 yrs)' },
+        { value: 'junior', label: '💼 Junior (1–3 yrs)' },
+        { value: 'senior', label: '⭐ Senior (3–8 yrs)' },
+        { value: 'architect', label: '🏛 Architect (8+ yrs)' }
+    ];
 
     const handleLogout = () => {
         localStorage.clear();
@@ -28,15 +46,16 @@ const AdminDashboard = () => {
     const handlePdfFileChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Validate file type
             if (file.type !== 'application/pdf') {
                 setUploadMessage('❌ Please select a valid PDF file');
                 setPdfFile(null);
-                e.target.value = ''; // Clear the input
+                e.target.value = '';
                 return;
             }
             setPdfFile(file);
-            setUploadMessage(''); // Clear any previous messages
+            setUploadMessage('');
+            setExtractedQuestions([]);
+            setShowPreview(false);
         }
     };
 
@@ -53,14 +72,59 @@ const AdminDashboard = () => {
 
         try {
             const data = await uploadPDF(selectedRole, pdfFile);
-            setUploadMessage(`✅ ${data.message} - ${data.questions_extracted} questions extracted`);
+
+            // Extract questions from response or mock data
+            const questions = data.questions_by_level?.[selectedLevel] || [];
+
+            if (questions.length === 0) {
+                setUploadMessage(`⚠️ No questions extracted for ${selectedLevel} level`);
+            } else {
+                setExtractedQuestions(questions);
+                setShowPreview(true);
+                setUploadMessage(`✅ ${questions.length} questions extracted for ${selectedLevel} level`);
+            }
+
             setPdfFile(null);
             e.target.reset();
         } catch (err) {
             setUploadMessage('❌ Upload failed. Please try again.');
+            console.error(err);
         } finally {
             setUploadLoading(false);
         }
+    };
+
+    const handleConfirmQuestions = async () => {
+        if (extractedQuestions.length === 0) {
+            setUploadMessage('❌ No questions to save');
+            return;
+        }
+
+        setConfirmLoading(true);
+        setUploadMessage('');
+
+        try {
+            const data = await updateQuestions({
+                role: selectedRole,
+                level: selectedLevel,
+                questions: extractedQuestions
+            });
+
+            setUploadMessage(`✅ ${extractedQuestions.length} questions saved to ${selectedRole} - ${selectedLevel}`);
+            setShowPreview(false);
+            setExtractedQuestions([]);
+        } catch (err) {
+            setUploadMessage('❌ Failed to save questions. Please try again.');
+            console.error(err);
+        } finally {
+            setConfirmLoading(false);
+        }
+    };
+
+    const handleCancelPreview = () => {
+        setShowPreview(false);
+        setExtractedQuestions([]);
+        setUploadMessage('');
     };
 
     const handleSendLink = async (e) => {
@@ -84,6 +148,7 @@ const AdminDashboard = () => {
             setCandidateEmail('');
         } catch (err) {
             setLinkMessage('❌ Failed to send link. Please try again.');
+            console.error(err);
         } finally {
             setLinkLoading(false);
         }
@@ -97,7 +162,7 @@ const AdminDashboard = () => {
                     <p className="admin-welcome">Welcome, {user?.name}</p>
                 </div>
                 <div className="header-buttons">
-                    <button onClick={() => navigate('/')} className="home-btn"> Home</button>
+                    <button onClick={() => navigate('/')} className="home-btn">🏠 Home</button>
                     <button onClick={handleLogout} className="logout-btn">Logout</button>
                 </div>
             </div>
@@ -107,42 +172,88 @@ const AdminDashboard = () => {
                 {/* Upload PDF Section */}
                 <div className="admin-section">
                     <h2>📄 Upload Question PDF</h2>
-                    <form onSubmit={handleUploadPDF}>
-                        <div className="form-group">
-                            <label>Select Role</label>
-                            <select
-                                value={selectedRole}
-                                onChange={(e) => setSelectedRole(e.target.value)}
-                            >
-                                <option value="java">Java Developer</option>
-                                <option value="python">Python Developer</option>
-                                <option value="react">React Developer</option>
-                                <option value="fullstack">Full Stack Developer</option>
-                            </select>
-                        </div>
+                    {!showPreview ? (
+                        <form onSubmit={handleUploadPDF}>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Select Role</label>
+                                    <select
+                                        value={selectedRole}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                    >
+                                        {roles.map(role => (
+                                            <option key={role.value} value={role.value}>
+                                                {role.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        <div className="form-group">
-                            <label>Upload PDF</label>
-                            <input
-                                type="file"
-                                accept=".pdf,application/pdf"
-                                onChange={handlePdfFileChange}
-                                disabled={uploadLoading}
-                            />
-                            {pdfFile && (
-                                <p style={{ marginTop: '8px', color: '#4ade80', fontSize: '14px' }}>
-                                    ✓ Selected: {pdfFile.name}
-                                </p>
-                            )}
-                        </div>
+                                <div className="form-group">
+                                    <label>Select Level</label>
+                                    <select
+                                        value={selectedLevel}
+                                        onChange={(e) => setSelectedLevel(e.target.value)}
+                                    >
+                                        {levels.map(level => (
+                                            <option key={level.value} value={level.value}>
+                                                {level.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
 
-                        <button type="submit" disabled={uploadLoading || !pdfFile}>
-                            {uploadLoading ? 'Uploading...' : 'Upload & Extract Questions'}
-                        </button>
-                    </form>
+                            <div className="form-group">
+                                <label>Upload PDF</label>
+                                <input
+                                    type="file"
+                                    accept=".pdf,application/pdf"
+                                    onChange={handlePdfFileChange}
+                                    disabled={uploadLoading}
+                                />
+                                {pdfFile && (
+                                    <p style={{ marginTop: '8px', color: '#4ade80', fontSize: '14px' }}>
+                                        ✓ Selected: {pdfFile.name}
+                                    </p>
+                                )}
+                            </div>
+
+                            <button type="submit" disabled={uploadLoading || !pdfFile}>
+                                {uploadLoading ? 'Uploading...' : 'Upload & Extract Questions'}
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="preview-section">
+                            <h3>Preview Questions - {selectedRole.toUpperCase()} ({selectedLevel})</h3>
+                            <div className="questions-list">
+                                {extractedQuestions.map((question, index) => (
+                                    <div key={index} className="question-item">
+                                        <strong>Q{index + 1}:</strong> {question}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="preview-actions">
+                                <button
+                                    onClick={handleCancelPreview}
+                                    className="btn-cancel"
+                                    disabled={confirmLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleConfirmQuestions}
+                                    className="btn-confirm"
+                                    disabled={confirmLoading}
+                                >
+                                    {confirmLoading ? 'Saving...' : 'Confirm & Save'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {uploadMessage && (
-                        <div className={uploadMessage.includes('✅') ? 'success-message' : 'error-message'}>
+                        <div className={uploadMessage.includes('✅') ? 'success-message' : uploadMessage.includes('⚠️') ? 'warning-message' : 'error-message'}>
                             {uploadMessage}
                         </div>
                     )}
@@ -159,10 +270,11 @@ const AdminDashboard = () => {
                                     value={linkRole}
                                     onChange={(e) => setLinkRole(e.target.value)}
                                 >
-                                    <option value="java">Java Developer</option>
-                                    <option value="python">Python Developer</option>
-                                    <option value="react">React Developer</option>
-                                    <option value="fullstack">Full Stack Developer</option>
+                                    {roles.map(role => (
+                                        <option key={role.value} value={role.value}>
+                                            {role.label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -172,10 +284,11 @@ const AdminDashboard = () => {
                                     value={linkLevel}
                                     onChange={(e) => setLinkLevel(e.target.value)}
                                 >
-                                    <option value="fresher">Fresher</option>
-                                    <option value="junior">Junior</option>
-                                    <option value="senior">Senior</option>
-                                    <option value="architect">Architect</option>
+                                    {levels.map(level => (
+                                        <option key={level.value} value={level.value}>
+                                            {level.label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
