@@ -5,12 +5,13 @@ import Feedback from "../components/Feedback"
 import Login from "../components/Login"
 import Register from "../components/Register"
 import Admin from "../components/AdminDashboard"
-
+import Navbar from "../components/NavBar"
 
 function App() {
 
   return (
     <>
+      <Navbar />
       <Routes>
 
         <Route path="/" element={<HomePage />} />
