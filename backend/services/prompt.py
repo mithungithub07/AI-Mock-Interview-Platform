@@ -1,4 +1,4 @@
-QUESTION_COUNT = 15  
+#QUESTION_COUNT = 15  
 
 def interview_feedback_prompt(role: str, level: str, interview_data) -> str:
     QUESTION_COUNT = len(interview_data)
