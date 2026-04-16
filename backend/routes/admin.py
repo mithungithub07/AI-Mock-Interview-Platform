@@ -129,7 +129,7 @@ def update_questions(
 
 @router.post("/validate-interview-token")
 def validate_interview_token(token: str = Form(...)):
-    """Validate interview link token (Public endpoint)"""
+    """Validate interview link token and return questions (Public endpoint)"""
     from services.auth_services import verify_token
     
     try:
@@ -139,12 +139,25 @@ def validate_interview_token(token: str = Form(...)):
         if payload.get("type") != "interview_link":
             raise HTTPException(status_code=400, detail="Invalid interview token")
         
+        role = payload.get("role")
+        level = payload.get("level")
+        
+        # Load questions for this role/level
+        questions_data = load_questions()
+        questions = questions_data.get(role, {}).get(level, [])
+        
+        if not questions:
+            raise HTTPException(status_code=404, detail=f"No questions found for {role}/{level}")
+        
         return {
             "valid": True,
-            "role": payload.get("role"),
-            "level": payload.get("level"),
-            "candidate_email": payload.get("candidate_email")
+            "role": role,
+            "level": level,
+            "candidate_email": payload.get("candidate_email"),
+            "questions": questions  # ✅ ADDED THIS
         }
     
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
