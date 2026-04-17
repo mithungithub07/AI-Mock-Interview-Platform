@@ -4,7 +4,7 @@ const API = axios.create({
   baseURL: "https://ai-mock-interview-platform-pryk.onrender.com",
 });
 
-// ✅ AUTO ATTACH TOKEN TO EVERY REQUEST
+// AUTO ATTACH TOKEN TO EVERY REQUEST
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -18,7 +18,7 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ================= PUBLIC APIs =================
+// ================== PUBLIC APIs =====================
 
 export const startInterview = async (role, level) => {
   const response = await API.post("/start-interview", {
