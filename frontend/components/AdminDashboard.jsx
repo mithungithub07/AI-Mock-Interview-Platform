@@ -74,7 +74,10 @@ const AdminDashboard = () => {
             const data = await uploadPDF(selectedRole, pdfFile);
 
             // Extract questions from response or mock data
-            const questions = data.questions_by_level?.[selectedLevel] || [];
+            // const questions = data.questions_by_level?.[selectedLevel] || [];
+            const questions = [];
+            setUploadMessage(`✅ PDF uploaded: ${data.questions_extracted} total questions extracted`);
+            setShowPreview(false);
 
             if (questions.length === 0) {
                 setUploadMessage(`⚠️ No questions extracted for ${selectedLevel} level`);
