@@ -142,6 +142,8 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
                 if not text:
                     continue
 
+                print(f"PAGE TEXT: {text[:500]}")
+
                 lines = text.split("\n")
                 for line in lines:
                     line = line.strip()
@@ -152,12 +154,19 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
                         question = match.group(1).strip()
                         if len(question) > 10:  # Valid question
                             questions.append(question)
+                            print(f"FOUND: {question}")
     
     except Exception as e:
         print(f"Error extracting from {pdf_path}: {e}")
     
     # Return all questions under "fresher" key (will be reassigned by admin.py)
+    print(f"TOTAL EXTRACTED: {len(questions)}") 
     return {"fresher": questions}
+
+
+
+
+
 
 def save_questions_to_json(role: str, questions_by_level: dict):
     """Save extracted questions to questions.json, avoiding duplicates"""
