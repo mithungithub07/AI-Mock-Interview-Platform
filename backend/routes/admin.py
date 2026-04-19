@@ -52,21 +52,23 @@ async def upload_pdf(
         #save_questions_to_json(role, {level: questions_by_level.get(level, [])})
 
         # Extract all questions from PDF regardless of internal structure
-        all_questions = []
+        all_extracted = []
         for level_qs in questions_by_level.values():
-             all_questions.extend(level_qs)
+             all_extracted.extend(level_qs)
 
         # Save to the selected level
-        save_questions_to_json(role, {level: all_questions if all_questions else questions_by_level.get(level, [])})
+        save_questions_to_json(role, {level: all_extracted})
 
-        total_questions = sum(len(q) for q in questions_by_level.values())
+
+        #total_questions = sum(len(q) for q in questions_by_level.values())
         
         return {
             "message": "PDF uploaded and questions extracted successfully",
             "role": role,
+            "level": level,
             "filename": file.filename,
-            "questions_extracted": total_questions,
-            "breakdown": {level: len(q) for level, q in questions_by_level.items()}
+            "questions_extracted": len(all_extracted),
+            "breakdown": {level: len(all_extracted)}
         }
     
     except Exception as e:
