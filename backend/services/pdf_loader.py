@@ -183,24 +183,30 @@ def save_questions_to_json(role: str, questions_by_level: dict):
         all_questions[role] = {level: [] for level in LEVEL_MAP.keys()}
     
     # Merge questions, skip duplicates
+    # Merge questions, skip duplicates
     for level, new_questions in questions_by_level.items():
         if level not in all_questions[role]:
             all_questions[role][level] = []
-        
+    
+    # Print first 3 existing questions
+        print(f"📚 Existing questions sample: {all_questions[role][level][:3]}")  # ← ADD
+    
+    # Normalize existing questions for comparison
         existing_normalized = {q.strip().lower() for q in all_questions[role][level]}
-        added_count = 0  # ← ADD THIS
-        
+        print(f"📊 Total existing normalized: {len(existing_normalized)}")  # ← ADD
+    
+        added_count = 0
+    
         for q in new_questions:
             q = q.strip()
             q_normalized = q.lower()
-            
-            print(f"🔍 Checking: '{q[:50]}...' | In existing: {q_normalized in existing_normalized}")
-            if q and q_normalized not in existing_normalized and len(q) > 10:
-             all_questions[role][level].append(q)
-             existing_normalized.add(q_normalized)
-             added_count += 1
         
-        print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
+            if q and q_normalized not in existing_normalized and len(q) > 10:
+                all_questions[role][level].append(q)
+                existing_normalized.add(q_normalized)
+                added_count += 1
+    
+    print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
     
     # Save back
     with open(QUESTIONS_JSON, "w") as f:
