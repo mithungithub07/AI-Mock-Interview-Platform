@@ -202,3 +202,12 @@ def save_questions_to_json(role: str, questions_by_level: dict):
     # Save back
     with open("questions.json", "w") as f:
         json.dump(all_questions, f, indent=2)
+
+
+def load_questions() -> dict:
+    """Load all questions from questions.json"""
+    try:
+        with open(QUESTIONS_JSON, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}    
