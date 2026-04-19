@@ -173,47 +173,45 @@ def save_questions_to_json(role: str, questions_by_level: dict):
     try:
         with open(QUESTIONS_JSON, "r") as f:
             all_questions = json.load(f)
-        print(f"📖 Loaded existing questions: {list(all_questions.keys())}")  # ← ADD THIS
+        print(f"📖 Loaded existing questions: {list(all_questions.keys())}")
     except FileNotFoundError:
         all_questions = {}
-        print("📄 Creating new questions.json")  # ← ADD THIS
-    
+        print("📄 Creating new questions.json")
+
     # Initialize role if not exists
     if role not in all_questions:
         all_questions[role] = {level: [] for level in LEVEL_MAP.keys()}
-    
-    # Merge questions, skip duplicates
+
     # Merge questions, skip duplicates
     for level, new_questions in questions_by_level.items():
         if level not in all_questions[role]:
             all_questions[role][level] = []
-    
-    # Print first 3 existing questions
-        print(f"📚 Existing questions sample: {all_questions[role][level][:3]}")  # ← ADD
-    
-    # Normalize existing questions for comparison
+
+        # Print first 3 existing questions
+        print(f"📚 Existing questions sample: {all_questions[role][level][:3]}")
+        
+        # Normalize existing questions for comparison
         existing_normalized = {q.strip().lower() for q in all_questions[role][level]}
-        print(f"📊 Total existing normalized: {len(existing_normalized)}")  # ← ADD
-    
+        print(f"📊 Total existing normalized: {len(existing_normalized)}")
+        
         added_count = 0
-    
+        
         for q in new_questions:
             q = q.strip()
             q_normalized = q.lower()
-        
+            
             if q and q_normalized not in existing_normalized and len(q) > 10:
                 all_questions[role][level].append(q)
                 existing_normalized.add(q_normalized)
                 added_count += 1
-    
-    print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
-    
+        
+        print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
+
     # Save back
     with open(QUESTIONS_JSON, "w") as f:
         json.dump(all_questions, f, indent=2)
-    
-    print(f"✅ Saved to questions.json - Total for {role}/{level}: {len(all_questions[role][level])}")  # ← ADD THIS
 
+    print(f"✅ Saved - Total in {role}: {sum(len(all_questions[role][lv]) for lv in all_questions[role].keys())}")
 
 def load_questions() -> dict:
     """Load all questions from questions.json"""
