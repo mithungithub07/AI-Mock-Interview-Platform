@@ -71,119 +71,201 @@ const AdminDashboard = () => {
         setUploadMessage('');
 
         try {
-            //const data = await uploadPDF(selectedRole, pdfFile);
             const data = await uploadPDF(selectedRole, selectedLevel, pdfFile);
 
-            // Extract questions from response or mock data
-            // const questions = data.questions_by_level?.[selectedLevel] || [];
-            const questions = [];
-            setUploadMessage(`✅ PDF uploaded: ${data.questions_extracted} total questions extracted`);
-            setShowPreview(false);
+            console.log("UPLOAD RESPONSE:", data);
 
-            if (questions.length === 0) {
-                setUploadMessage(`⚠️ No questions extracted for ${selectedLevel} level`);
+            if (data.questions_extracted > 0) {
+                setUploadMessage(`✅ ${data.questions_extracted} questions uploaded to ${selectedRole} - ${selectedLevel}`);
             } else {
-                setExtractedQuestions(questions);
-                setShowPreview(true);
-                setUploadMessage(`✅ ${questions.length} questions extracted for ${selectedLevel} level`);
+                setUploadMessage(`⚠️ No questions extracted`);
             }
 
             setPdfFile(null);
             e.target.reset();
+
         } catch (err) {
-            setUploadMessage('❌ Upload failed. Please try again.');
-            console.error(err);
+            setUploadMessage(`❌ Upload failed: ${err.response?.data?.detail || err.message}`);
+            console.error('Upload error:', err);
         } finally {
             setUploadLoading(false);
         }
-    };
 
-    const handleConfirmQuestions = async () => {
-        if (extractedQuestions.length === 0) {
-            setUploadMessage('❌ No questions to save');
-            return;
-        }
+        const handleConfirmQuestions = async () => {
+            if (extractedQuestions.length === 0) {
+                setUploadMessage('❌ No questions to save');
+                return;
+            }
 
-        setConfirmLoading(true);
-        setUploadMessage('');
+            setConfirmLoading(true);
+            setUploadMessage('');
 
-        try {
-            const data = await updateQuestions({
-                role: selectedRole,
-                level: selectedLevel,
-                questions: extractedQuestions
-            });
+            try {
+                const data = await updateQuestions({
+                    role: selectedRole,
+                    level: selectedLevel,
+                    questions: extractedQuestions
+                });
 
-            setUploadMessage(`✅ ${extractedQuestions.length} questions saved to ${selectedRole} - ${selectedLevel}`);
+                setUploadMessage(`✅ ${extractedQuestions.length} questions saved to ${selectedRole} - ${selectedLevel}`);
+                setShowPreview(false);
+                setExtractedQuestions([]);
+            } catch (err) {
+                setUploadMessage('❌ Failed to save questions. Please try again.');
+                console.error(err);
+            } finally {
+                setConfirmLoading(false);
+            }
+        };
+
+        const handleCancelPreview = () => {
             setShowPreview(false);
             setExtractedQuestions([]);
-        } catch (err) {
-            setUploadMessage('❌ Failed to save questions. Please try again.');
-            console.error(err);
-        } finally {
-            setConfirmLoading(false);
-        }
-    };
+            setUploadMessage('');
+        };
 
-    const handleCancelPreview = () => {
-        setShowPreview(false);
-        setExtractedQuestions([]);
-        setUploadMessage('');
-    };
+        const handleSendLink = async (e) => {
+            e.preventDefault();
 
-    const handleSendLink = async (e) => {
-        e.preventDefault();
+            if (!candidateEmail) {
+                setLinkMessage('❌ Please enter candidate email');
+                return;
+            }
 
-        if (!candidateEmail) {
-            setLinkMessage('❌ Please enter candidate email');
-            return;
-        }
+            setLinkLoading(true);
+            setLinkMessage('');
 
-        setLinkLoading(true);
-        setLinkMessage('');
+            try {
+                const data = await sendInterviewLink({
+                    email: candidateEmail,
+                    role: linkRole,
+                    level: linkLevel
+                });
+                setLinkMessage(`✅ Interview link sent to ${candidateEmail}`);
+                setCandidateEmail('');
+            } catch (err) {
+                setLinkMessage('❌ Failed to send link. Please try again.');
+                console.error(err);
+            } finally {
+                setLinkLoading(false);
+            }
+        };
 
-        try {
-            const data = await sendInterviewLink({
-                email: candidateEmail,
-                role: linkRole,
-                level: linkLevel
-            });
-            setLinkMessage(`✅ Interview link sent to ${candidateEmail}`);
-            setCandidateEmail('');
-        } catch (err) {
-            setLinkMessage('❌ Failed to send link. Please try again.');
-            console.error(err);
-        } finally {
-            setLinkLoading(false);
-        }
-    };
-
-    return (
-        <div className="admin-container">
-            <div className="admin-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p className="admin-welcome">Welcome, {user?.name}</p>
+        return (
+            <div className="admin-container">
+                <div className="admin-header">
+                    <div>
+                        <h1>Admin Dashboard</h1>
+                        <p className="admin-welcome">Welcome, {user?.name}</p>
+                    </div>
+                    <div className="header-buttons">
+                        <button onClick={() => navigate('/')} className="home-btn">🏠 Home</button>
+                        <button onClick={handleLogout} className="logout-btn">Logout</button>
+                    </div>
                 </div>
-                <div className="header-buttons">
-                    <button onClick={() => navigate('/')} className="home-btn">🏠 Home</button>
-                    <button onClick={handleLogout} className="logout-btn">Logout</button>
-                </div>
-            </div>
 
-            <div className="admin-content">
+                <div className="admin-content">
 
-                {/* Upload PDF Section */}
-                <div className="admin-section">
-                    <h2>📄 Upload Question PDF</h2>
-                    {!showPreview ? (
-                        <form onSubmit={handleUploadPDF}>
+                    {/* Upload PDF Section */}
+                    <div className="admin-section">
+                        <h2>📄 Upload Question PDF</h2>
+                        {!showPreview ? (
+                            <form onSubmit={handleUploadPDF}>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Select Role</label>
+                                        <select
+                                            value={selectedRole}
+                                            onChange={(e) => setSelectedRole(e.target.value)}
+                                        >
+                                            {roles.map(role => (
+                                                <option key={role.value} value={role.value}>
+                                                    {role.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Select Level</label>
+                                        <select
+                                            value={selectedLevel}
+                                            onChange={(e) => setSelectedLevel(e.target.value)}
+                                        >
+                                            {levels.map(level => (
+                                                <option key={level.value} value={level.value}>
+                                                    {level.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Upload PDF</label>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,application/pdf"
+                                        onChange={handlePdfFileChange}
+                                        disabled={uploadLoading}
+                                    />
+                                    {pdfFile && (
+                                        <p style={{ marginTop: '8px', color: '#4ade80', fontSize: '14px' }}>
+                                            ✓ Selected: {pdfFile.name}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <button type="submit" disabled={uploadLoading || !pdfFile}>
+                                    {uploadLoading ? 'Uploading...' : 'Upload & Extract Questions'}
+                                </button>
+                            </form>
+                        ) : (
+                            <div className="preview-section">
+                                <h3>Preview Questions - {selectedRole.toUpperCase()} ({selectedLevel})</h3>
+                                <div className="questions-list">
+                                    {extractedQuestions.map((question, index) => (
+                                        <div key={index} className="question-item">
+                                            <strong>Q{index + 1}:</strong> {question}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="preview-actions">
+                                    <button
+                                        onClick={handleCancelPreview}
+                                        className="btn-cancel"
+                                        disabled={confirmLoading}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmQuestions}
+                                        className="btn-confirm"
+                                        disabled={confirmLoading}
+                                    >
+                                        {confirmLoading ? 'Saving...' : 'Confirm & Save'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {uploadMessage && (
+                            <div className={uploadMessage.includes('✅') ? 'success-message' : uploadMessage.includes('⚠️') ? 'warning-message' : 'error-message'}>
+                                {uploadMessage}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Send Interview Link Section */}
+                    <div className="admin-section">
+                        <h2>✉️ Send Interview Link</h2>
+                        <form onSubmit={handleSendLink}>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Select Role</label>
+                                    <label>Role</label>
                                     <select
-                                        value={selectedRole}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                        value={linkRole}
+                                        onChange={(e) => setLinkRole(e.target.value)}
                                     >
                                         {roles.map(role => (
                                             <option key={role.value} value={role.value}>
@@ -194,10 +276,10 @@ const AdminDashboard = () => {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Select Level</label>
+                                    <label>Level</label>
                                     <select
-                                        value={selectedLevel}
-                                        onChange={(e) => setSelectedLevel(e.target.value)}
+                                        value={linkLevel}
+                                        onChange={(e) => setLinkLevel(e.target.value)}
                                     >
                                         {levels.map(level => (
                                             <option key={level.value} value={level.value}>
@@ -209,120 +291,31 @@ const AdminDashboard = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Upload PDF</label>
+                                <label>Candidate Email</label>
                                 <input
-                                    type="file"
-                                    accept=".pdf,application/pdf"
-                                    onChange={handlePdfFileChange}
-                                    disabled={uploadLoading}
+                                    type="email"
+                                    value={candidateEmail}
+                                    onChange={(e) => setCandidateEmail(e.target.value)}
+                                    placeholder="candidate@email.com"
+                                    required
                                 />
-                                {pdfFile && (
-                                    <p style={{ marginTop: '8px', color: '#4ade80', fontSize: '14px' }}>
-                                        ✓ Selected: {pdfFile.name}
-                                    </p>
-                                )}
                             </div>
 
-                            <button type="submit" disabled={uploadLoading || !pdfFile}>
-                                {uploadLoading ? 'Uploading...' : 'Upload & Extract Questions'}
+                            <button type="submit" disabled={linkLoading}>
+                                {linkLoading ? 'Sending...' : 'Send Interview Link'}
                             </button>
                         </form>
-                    ) : (
-                        <div className="preview-section">
-                            <h3>Preview Questions - {selectedRole.toUpperCase()} ({selectedLevel})</h3>
-                            <div className="questions-list">
-                                {extractedQuestions.map((question, index) => (
-                                    <div key={index} className="question-item">
-                                        <strong>Q{index + 1}:</strong> {question}
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="preview-actions">
-                                <button
-                                    onClick={handleCancelPreview}
-                                    className="btn-cancel"
-                                    disabled={confirmLoading}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleConfirmQuestions}
-                                    className="btn-confirm"
-                                    disabled={confirmLoading}
-                                >
-                                    {confirmLoading ? 'Saving...' : 'Confirm & Save'}
-                                </button>
-                            </div>
-                        </div>
-                    )}
 
-                    {uploadMessage && (
-                        <div className={uploadMessage.includes('✅') ? 'success-message' : uploadMessage.includes('⚠️') ? 'warning-message' : 'error-message'}>
-                            {uploadMessage}
-                        </div>
-                    )}
+                        {linkMessage && (
+                            <div className={linkMessage.includes('✅') ? 'success-message' : 'error-message'}>
+                                {linkMessage}
+                            </div>
+                        )}
+                    </div>
+
                 </div>
-
-                {/* Send Interview Link Section */}
-                <div className="admin-section">
-                    <h2>✉️ Send Interview Link</h2>
-                    <form onSubmit={handleSendLink}>
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Role</label>
-                                <select
-                                    value={linkRole}
-                                    onChange={(e) => setLinkRole(e.target.value)}
-                                >
-                                    {roles.map(role => (
-                                        <option key={role.value} value={role.value}>
-                                            {role.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Level</label>
-                                <select
-                                    value={linkLevel}
-                                    onChange={(e) => setLinkLevel(e.target.value)}
-                                >
-                                    {levels.map(level => (
-                                        <option key={level.value} value={level.value}>
-                                            {level.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Candidate Email</label>
-                            <input
-                                type="email"
-                                value={candidateEmail}
-                                onChange={(e) => setCandidateEmail(e.target.value)}
-                                placeholder="candidate@email.com"
-                                required
-                            />
-                        </div>
-
-                        <button type="submit" disabled={linkLoading}>
-                            {linkLoading ? 'Sending...' : 'Send Interview Link'}
-                        </button>
-                    </form>
-
-                    {linkMessage && (
-                        <div className={linkMessage.includes('✅') ? 'success-message' : 'error-message'}>
-                            {linkMessage}
-                        </div>
-                    )}
-                </div>
-
             </div>
-        </div>
-    );
-};
+        );
+    };
 
-export default AdminDashboard;
+    export default AdminDashboard;
