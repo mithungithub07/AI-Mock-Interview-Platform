@@ -133,30 +133,51 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
     Extract questions from PDF and organize by level
     Returns: {"fresher": [...], "junior": [...], "senior": [...], "architect": [...]}
     """
-    # TODO: Implement your PDF extraction logic
-    # This is a placeholder - customize based on your PDF format
-    
-    questions = {
-        "fresher": [],
-        "junior": [],
-        "senior": [],
-        "architect": []
-    }
-    
-    # Example extraction (customize this)
-    with open(pdf_path, 'rb') as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-        
-        # Parse text and categorize questions
-        # This is where you'd implement your parsing logic
-        
-    return questions
+    result = {level: [] for level in LEVEL_MAP.keys()}
+    current_level = None
+
+    try:
+        with open(pdf_path, "rb") as f:
+            reader = PyPDF2.PdfReader(f)
+            for page in reader.pages:
+                text = page.extract_text()
+                if not text:
+                    continue
+
+                lines = text.split("\n")
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        continue
+
+                    # Check for level headings
+                    matched_level = None
+                    for level_key, heading in LEVEL_MAP.items():
+                        if heading.lower() in line.lower():
+                            matched_level = level_key
+                            break
+
+                    if matched_level:
+                        current_level = matched_level
+                        continue
+
+                    # Extract questions (numbered like "1.", "2.", etc.)
+                    if current_level:
+                        # Remove question numbers like "1. ", "2. ", etc.
+                        import re
+                        cleaned = re.sub(r'^\d+\.\s*', '', line)
+                        
+                        # Only add if it's a real question (>15 chars)
+                        if len(cleaned) > 15:
+                            result[current_level].append(cleaned)
+
+    except Exception as e:
+        print(f"Error extracting from {pdf_path}: {e}")
+
+    return result
 
 def save_questions_to_json(role: str, questions_by_level: dict):
-    """Save extracted questions to questions.json"""
+    """Save extracted questions to questions.json, avoiding duplicates"""
     
     # Load existing questions
     try:
@@ -165,17 +186,19 @@ def save_questions_to_json(role: str, questions_by_level: dict):
     except FileNotFoundError:
         all_questions = {}
     
-    # Update questions for this role
-    all_questions[role] = questions_by_level
+    # Initialize role if not exists
+    if role not in all_questions:
+        all_questions[role] = {level: [] for level in LEVEL_MAP.keys()}
+    
+    # Merge questions, skip duplicates
+    for level, new_questions in questions_by_level.items():
+        existing = set(all_questions[role].get(level, []))
+        
+        for q in new_questions:
+            if q not in existing:
+                all_questions[role][level].append(q)
+                existing.add(q)
     
     # Save back
     with open("questions.json", "w") as f:
         json.dump(all_questions, f, indent=2)
-
-def load_questions() -> dict:
-    """Load all questions from questions.json"""
-    try:
-        with open("questions.json", "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}    

@@ -12,6 +12,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 @router.post("/upload-pdf")
 async def upload_pdf(
     role: str = Form(...),
+    level: str = Form(...),
     file: UploadFile = File(...),
     admin: dict = Depends(get_admin_user)
 ):
@@ -47,7 +48,8 @@ async def upload_pdf(
         questions_by_level = extract_questions_from_pdf(pdf_path)
         
         # Save to questions.json
-        save_questions_to_json(role, questions_by_level)
+        # Save_questions_to_json(role, questions_by_level)
+        save_questions_to_json(role, {level: questions_by_level.get(level, [])})
         
         total_questions = sum(len(q) for q in questions_by_level.values())
         

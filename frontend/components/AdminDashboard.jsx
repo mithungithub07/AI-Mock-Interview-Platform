@@ -71,7 +71,8 @@ const AdminDashboard = () => {
         setUploadMessage('');
 
         try {
-            const data = await uploadPDF(selectedRole, pdfFile);
+            //const data = await uploadPDF(selectedRole, pdfFile);
+            const data = await uploadPDF(selectedRole, selectedLevel, pdfFile);
 
             // Extract questions from response or mock data
             // const questions = data.questions_by_level?.[selectedLevel] || [];

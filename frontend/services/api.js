@@ -48,9 +48,10 @@ export const registerUser = async (data) => {
 
 // ================= ADMIN APIs (NO TOKEN PARAM NEEDED) =================
 
-export const uploadPDF = async (role, file) => {
+export const uploadPDF = async (role, level, file) => {
   const formData = new FormData();
   formData.append("role", role);
+  formData.append("level", level);
   formData.append("file", file);
 
   const response = await API.post("/admin/upload-pdf", formData, {
