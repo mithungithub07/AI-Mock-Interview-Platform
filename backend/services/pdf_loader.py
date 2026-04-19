@@ -192,6 +192,7 @@ def save_questions_to_json(role: str, questions_by_level: dict):
         
         for q in new_questions:
             q = q.strip()
+            print(f"🔍 Checking: '{q}' | In existing: {q in existing}") 
             if q and q not in existing and len(q) > 10:
                 all_questions[role][level].append(q)
                 existing.add(q)

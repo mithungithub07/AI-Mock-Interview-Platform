@@ -178,18 +178,15 @@ def validate_interview_token(token: str = Form(...)):
    
 
 @router.get("/download-questions")
-def download_questions(admin: dict = Depends(get_admin_user)):
+def download_questions():
     """Download questions.json file"""
     return FileResponse(QUESTIONS_JSON, filename="questions.json", media_type="application/json")
 
 
 
 @router.get("/view-questions/{role}/{level}")
-def view_questions_by_role_level(
-    role: str,
-    level: str,
-    admin: dict = Depends(get_admin_user)
-):
+def view_questions_by_role_level(role: str, level: str):
+
     """View questions for specific role/level"""
     try:
         questions = load_questions()
