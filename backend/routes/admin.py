@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from services.auth_services import get_admin_user, create_interview_token
 from services.emailservices import send_interview_link
-from services.pdf_loader import extract_questions_from_pdf, save_questions_to_json, load_questions
+from services.pdf_loader import extract_questions_from_pdf, save_questions_to_json, load_questions,QUESTIONS_JSON
 from models.admin_model import SendInterviewLinkRequest, QuestionUpdate
+from fastapi.responses import FileResponse
 import os
 import shutil
 import json
@@ -173,3 +174,38 @@ def validate_interview_token(token: str = Form(...)):
         raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
+    
+   
+
+@router.get("/download-questions")
+def download_questions(admin: dict = Depends(get_admin_user)):
+    """Download questions.json file"""
+    return FileResponse(QUESTIONS_JSON, filename="questions.json", media_type="application/json")
+
+
+
+@router.get("/view-questions/{role}/{level}")
+def view_questions_by_role_level(
+    role: str,
+    level: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """View questions for specific role/level"""
+    try:
+        questions = load_questions()
+        
+        if role not in questions:
+            raise HTTPException(status_code=404, detail=f"Role '{role}' not found")
+        
+        if level not in questions[role]:
+            raise HTTPException(status_code=404, detail=f"Level '{level}' not found")
+        
+        return {
+            "role": role,
+            "level": level,
+            "count": len(questions[role][level]),
+            "questions": questions[role][level]
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
