@@ -187,18 +187,20 @@ def save_questions_to_json(role: str, questions_by_level: dict):
         if level not in all_questions[role]:
             all_questions[role][level] = []
         
-        existing = set(all_questions[role][level])
+        existing_normalized = {q.strip().lower() for q in all_questions[role][level]}
         added_count = 0  # ← ADD THIS
         
         for q in new_questions:
             q = q.strip()
-            print(f"🔍 Checking: '{q}' | In existing: {q in existing}") 
-            if q and q not in existing and len(q) > 10:
-                all_questions[role][level].append(q)
-                existing.add(q)
-                added_count += 1  # ← ADD THIS
+            q_normalized = q.lower()
+            
+            print(f"🔍 Checking: '{q[:50]}...' | In existing: {q_normalized in existing_normalized}")
+            if q and q_normalized not in existing_normalized and len(q) > 10:
+             all_questions[role][level].append(q)
+             existing_normalized.add(q_normalized)
+             added_count += 1
         
-        print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")  # ← ADD THIS
+        print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
     
     # Save back
     with open(QUESTIONS_JSON, "w") as f:
