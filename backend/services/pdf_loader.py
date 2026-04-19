@@ -207,9 +207,15 @@ def save_questions_to_json(role: str, questions_by_level: dict):
         
         print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")
 
-    # Save back
+   # Save back
     with open(QUESTIONS_JSON, "w") as f:
         json.dump(all_questions, f, indent=2)
+
+    # ✅ VERIFY what was actually saved
+    with open(QUESTIONS_JSON, "r") as f:
+        verify = json.load(f)
+        verify_count = len(verify[role][level])
+        print(f"🔍 VERIFY: File now has {verify_count} questions for {role}/{level}")
 
     print(f"✅ Saved - Total in {role}: {sum(len(all_questions[role][lv]) for lv in all_questions[role].keys())}")
 
