@@ -167,12 +167,16 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
 def save_questions_to_json(role: str, questions_by_level: dict):
     """Save extracted questions to questions.json, avoiding duplicates"""
     
+    print(f"📁 Saving to: {QUESTIONS_JSON}")  # ← ADD THIS
+    
     # Load existing questions
     try:
         with open(QUESTIONS_JSON, "r") as f:
             all_questions = json.load(f)
+        print(f"📖 Loaded existing questions: {list(all_questions.keys())}")  # ← ADD THIS
     except FileNotFoundError:
         all_questions = {}
+        print("📄 Creating new questions.json")  # ← ADD THIS
     
     # Initialize role if not exists
     if role not in all_questions:
@@ -184,18 +188,22 @@ def save_questions_to_json(role: str, questions_by_level: dict):
             all_questions[role][level] = []
         
         existing = set(all_questions[role][level])
+        added_count = 0  # ← ADD THIS
         
         for q in new_questions:
-            q = q.strip()  # ← ADD THIS
-            if q and q not in existing and len(q) > 10:  # ← ADD len check
+            q = q.strip()
+            if q and q not in existing and len(q) > 10:
                 all_questions[role][level].append(q)
                 existing.add(q)
+                added_count += 1  # ← ADD THIS
+        
+        print(f"➕ Added {added_count} new questions (skipped {len(new_questions) - added_count} duplicates)")  # ← ADD THIS
     
     # Save back
     with open(QUESTIONS_JSON, "w") as f:
         json.dump(all_questions, f, indent=2)
     
-    print(f"✅ Saved {len(new_questions)} questions to {role}/{level}")  # ← ADD THIS
+    print(f"✅ Saved to questions.json - Total for {role}/{level}: {len(all_questions[role][level])}")  # ← ADD THIS
 
 
 def load_questions() -> dict:
