@@ -164,16 +164,12 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
     return {"fresher": questions}
 
 
-
-
-
-
 def save_questions_to_json(role: str, questions_by_level: dict):
     """Save extracted questions to questions.json, avoiding duplicates"""
     
     # Load existing questions
     try:
-        with open("questions.json", "r") as f:
+        with open(QUESTIONS_JSON, "r") as f:
             all_questions = json.load(f)
     except FileNotFoundError:
         all_questions = {}
@@ -184,16 +180,22 @@ def save_questions_to_json(role: str, questions_by_level: dict):
     
     # Merge questions, skip duplicates
     for level, new_questions in questions_by_level.items():
-        existing = set(all_questions[role].get(level, []))
+        if level not in all_questions[role]:
+            all_questions[role][level] = []
+        
+        existing = set(all_questions[role][level])
         
         for q in new_questions:
-            if q not in existing:
+            q = q.strip()  # ← ADD THIS
+            if q and q not in existing and len(q) > 10:  # ← ADD len check
                 all_questions[role][level].append(q)
                 existing.add(q)
     
     # Save back
-    with open("questions.json", "w") as f:
+    with open(QUESTIONS_JSON, "w") as f:
         json.dump(all_questions, f, indent=2)
+    
+    print(f"✅ Saved {len(new_questions)} questions to {role}/{level}")  # ← ADD THIS
 
 
 def load_questions() -> dict:
