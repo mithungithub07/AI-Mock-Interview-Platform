@@ -49,8 +49,16 @@ async def upload_pdf(
         
         # Save to questions.json
         # Save_questions_to_json(role, questions_by_level)
-        save_questions_to_json(role, {level: questions_by_level.get(level, [])})
-        
+        #save_questions_to_json(role, {level: questions_by_level.get(level, [])})
+
+        # Extract all questions from PDF regardless of internal structure
+        all_questions = []
+        for level_qs in questions_by_level.values():
+             all_questions.extend(level_qs)
+
+        # Save to the selected level
+        save_questions_to_json(role, {level: all_questions if all_questions else questions_by_level.get(level, [])})
+
         total_questions = sum(len(q) for q in questions_by_level.values())
         
         return {

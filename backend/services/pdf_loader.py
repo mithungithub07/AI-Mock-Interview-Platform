@@ -129,13 +129,11 @@ def get_questions_from_json(role: str, level: str, count: int = 15) -> list:
 
 
 def extract_questions_from_pdf(pdf_path: str) -> dict:
-    """
-    Extract questions from PDF and organize by level
-    Returns: {"fresher": [...], "junior": [...], "senior": [...], "architect": [...]}
-    """
-    result = {level: [] for level in LEVEL_MAP.keys()}
-    current_level = None
-
+    """Extract ALL questions from PDF - ignore level headers"""
+    import re
+    
+    questions = []
+    
     try:
         with open(pdf_path, "rb") as f:
             reader = PyPDF2.PdfReader(f)
@@ -147,34 +145,19 @@ def extract_questions_from_pdf(pdf_path: str) -> dict:
                 lines = text.split("\n")
                 for line in lines:
                     line = line.strip()
-                    if not line:
-                        continue
-
-                    # Check for level headings
-                    matched_level = None
-                    for level_key, heading in LEVEL_MAP.items():
-                        if heading.lower() in line.lower():
-                            matched_level = level_key
-                            break
-
-                    if matched_level:
-                        current_level = matched_level
-                        continue
-
-                    # Extract questions (numbered like "1.", "2.", etc.)
-                    if current_level:
-                        # Remove question numbers like "1. ", "2. ", etc.
-                        import re
-                        cleaned = re.sub(r'^\d+\.\s*', '', line)
-                        
-                        # Only add if it's a real question (>15 chars)
-                        if len(cleaned) > 15:
-                            result[current_level].append(cleaned)
-
+                    
+                    # Match numbered questions: "1. ", "2. ", etc.
+                    match = re.match(r'^\d+\.\s+(.+)', line)
+                    if match:
+                        question = match.group(1).strip()
+                        if len(question) > 10:  # Valid question
+                            questions.append(question)
+    
     except Exception as e:
         print(f"Error extracting from {pdf_path}: {e}")
-
-    return result
+    
+    # Return all questions under "fresher" key (will be reassigned by admin.py)
+    return {"fresher": questions}
 
 def save_questions_to_json(role: str, questions_by_level: dict):
     """Save extracted questions to questions.json, avoiding duplicates"""
